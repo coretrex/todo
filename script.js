@@ -76,9 +76,16 @@ function logOut() {
         document.getElementById('user-menu').style.display = 'none';
         document.getElementById('login-button').style.display = 'block';
         alert('You have been logged out.');
+        clearTasks();
     }).catch(error => {
         alert(error.message);
     });
+}
+
+function clearTasks() {
+    document.getElementById('todo-column').innerHTML = '';
+    document.getElementById('onhold-column').innerHTML = '';
+    document.getElementById('done-column').innerHTML = '';
 }
 
 function saveTasks(userId) {
@@ -123,6 +130,7 @@ function loadTasks(userId) {
         .then(doc => {
             if (doc.exists) {
                 const tasks = doc.data();
+                console.log('Loaded tasks:', tasks);
 
                 tasks.todo.forEach(task => {
                     createTaskElement(task, 'todo-column');
@@ -140,7 +148,7 @@ function loadTasks(userId) {
             }
         })
         .catch(error => {
-            console.error('Error loading tasks: ', error);
+            console.error('Error loading tasks:', error);
         });
 }
 
@@ -432,6 +440,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             updateUserIcon(user.email);
             loadTasks(user.uid);
+        } else {
+            clearTasks();
         }
         updateCounts();
         showQuoteModal();
