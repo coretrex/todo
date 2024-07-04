@@ -1,0 +1,209 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    text-align: center;
+    margin: 20px;
+}
+
+#timer-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#timer {
+    font-size: 48px;
+    margin-top: 10px;
+    color: #333;
+}
+
+#stop-timer-button {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#stop-timer-button:hover {
+    background-color: #c9302c;
+}
+
+.metrics {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.metrics > div {
+    margin: 0 15px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.container {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+
+.column {
+    width: 30%;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 300px;
+    position: relative;
+}
+
+.todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+#add-task-button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#add-task-button:hover {
+    background-color: #4cae4c;
+}
+
+.todo-item, .done-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: grab;
+    background-color: #f9f9f9;
+}
+
+.done-item {
+    background-color: #e0e0e0;
+}
+
+.task-title {
+    border: none;
+    background: none;
+    width: 40%;
+    font-size: 16px;
+}
+
+.time-buttons button {
+    margin: 0 5px;
+    background-color: #5bc0de;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.time-buttons button:hover {
+    background-color: #31b0d5;
+}
+
+.delete-button {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #c9302c;
+}
+
+.drag-over {
+    border: 2px dashed #ccc;
+}
+
+.blurred {
+    filter: blur(5px);
+}
+
+.current-task, .current-task * {
+    filter: none !important;
+}
+
+/* Modal Styles */
+.quote-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.quote-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.quote-content {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+}
+
+#motivational-quote {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#quote-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+#quote-button:hover {
+    background-color: #0056b3;
+}

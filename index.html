@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+    <h1 id="header-title">To-Do List</h1>
+    <div id="timer-container">
+        <div id="timer">00:00</div>
+        <button id="stop-timer-button">Stop Timer</button>
+    </div>
+    <div class="metrics">
+        <div>Tasks: <span id="tasks-count">0</span></div>
+        <div>On-Hold: <span id="onhold-count">0</span></div>
+        <div>Completed: <span id="completed-count">0</span></div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="column" id="todo-column">
+        <div class="todo-header">
+            <h2>To-Do</h2>
+            <button id="add-task-button">+</button>
+        </div>
+        <div class="todo-item" draggable="true" id="task-0">
+            <input type="text" value="Task 1" class="task-title">
+            <div class="time-buttons">
+                <button onclick="startTimer(15, this)">15m</button>
+                <button onclick="startTimer(30, this)">30m</button>
+                <button onclick="startTimer(60, this)">60m</button>
+            </div>
+            <button onclick="markAsDone(this)">✓</button>
+            <button onclick="markAsOnHold(this)">On-Hold</button>
+            <button onclick="deleteTask(this)" class="delete-button">x</button>
+        </div>
+    </div>
+    <div class="column" id="onhold-column">
+        <h2>On-Hold</h2>
+    </div>
+    <div class="column" id="done-column">
+        <h2>Done</h2>
+    </div>
+</div>
+
+<div id="quote-modal" class="quote-modal">
+    <div class="quote-content">
+        <p id="motivational-quote"></p>
+        <button id="quote-button">Let's Do This</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
