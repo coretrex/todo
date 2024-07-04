@@ -3,6 +3,9 @@
 let timer;
 let currentTaskElement;
 
+// Initialize Firestore
+const db = firebase.firestore();
+
 document.getElementById('login-button').addEventListener('click', () => {
     document.getElementById('login-modal').style.display = 'block';
 });
@@ -25,14 +28,15 @@ function signUp() {
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
     if (email && password) {
-        if (localStorage.getItem(`user_${email}`)) {
-            alert('User already exists. Please log in.');
-        } else {
-            localStorage.setItem(`user_${email}`, JSON.stringify({ email, password }));
-            alert('User registered successfully!');
-            document.getElementById('register-form').style.display = 'none';
-            document.getElementById('login-form').style.display = 'block';
-        }
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(userCredential => {
+                alert('User registered successfully!');
+                document.getElementById('register-form').style.display = 'none';
+                document.getElementById('login-form').style.display = 'block';
+            })
+            .catch(error => {
+                alert(error.message);
+            });
     } else {
         alert('Please enter both email and password.');
     }
@@ -41,16 +45,16 @@ function signUp() {
 function signIn() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-    const user = JSON.parse(localStorage.getItem(`user_${email}`));
-    if (user && user.password === password) {
-        alert('Sign in successful!');
-        localStorage.setItem('currentUser', email);
-        document.getElementById('login-modal').style.display = 'none';
-        updateUserIcon(email);
-        loadTasks(email);
-    } else {
-        alert('Invalid email or password.');
-    }
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+            alert('Sign in successful!');
+            document.getElementById('login-modal').style.display = 'none';
+            updateUserIcon(email);
+            loadTasks(userCredential.user.uid);
+        })
+        .catch(error => {
+            alert(error.message);
+        });
 }
 
 function updateUserIcon(email) {
@@ -68,10 +72,13 @@ function toggleUserMenu() {
 }
 
 function logOut() {
-    localStorage.removeItem('currentUser');
-    document.getElementById('user-menu').style.display = 'none';
-    document.getElementById('login-button').style.display = 'block';
-    alert('You have been logged out.');
+    firebase.auth().signOut().then(() => {
+        document.getElementById('user-menu').style.display = 'none';
+        document.getElementById('login-button').style.display = 'block';
+        alert('You have been logged out.');
+    }).catch(error => {
+        alert(error.message);
+    });
 }
 
 function saveTasks(userId) {
@@ -102,26 +109,37 @@ function saveTasks(userId) {
         });
     });
 
-    localStorage.setItem(`tasks_${userId}`, JSON.stringify(tasks));
+    db.collection('tasks').doc(userId).set(tasks)
+        .then(() => {
+            console.log('Tasks successfully saved!');
+        })
+        .catch(error => {
+            console.error('Error saving tasks: ', error);
+        });
 }
 
 function loadTasks(userId) {
-    const savedTasks = localStorage.getItem(`tasks_${userId}`);
-    if (savedTasks) {
-        const tasks = JSON.parse(savedTasks);
+    db.collection('tasks').doc(userId).get()
+        .then(doc => {
+            if (doc.exists) {
+                const tasks = doc.data();
 
-        tasks.todo.forEach(task => {
-            createTaskElement(task, 'todo-column');
-        });
+                tasks.todo.forEach(task => {
+                    createTaskElement(task, 'todo-column');
+                });
 
-        tasks.onhold.forEach(task => {
-            createTaskElement(task, 'onhold-column');
-        });
+                tasks.onhold.forEach(task => {
+                    createTaskElement(task, 'onhold-column');
+                });
 
-        tasks.done.forEach(task => {
-            createTaskElement(task, 'done-column', true);
+                tasks.done.forEach(task => {
+                    createTaskElement(task, 'done-column', true);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading tasks: ', error);
         });
-    }
 }
 
 function createTaskElement(task, columnId, isDone = false) {
@@ -275,7 +293,7 @@ function markAsDone(button) {
     button.remove();
     document.getElementById('done-column').appendChild(task);
     updateCounts();
-    saveTasks();
+    saveTasks(firebase.auth().currentUser.uid);
 }
 
 function markAsOnHold(button) {
@@ -283,14 +301,14 @@ function markAsOnHold(button) {
     const task = button.parentElement;
     document.getElementById('onhold-column').appendChild(task);
     updateCounts();
-    saveTasks();
+    saveTasks(firebase.auth().currentUser.uid);
 }
 
 function deleteTask(button) {
     const task = button.parentElement;
     task.remove();
     updateCounts();
-    saveTasks();
+    saveTasks(firebase.auth().currentUser.uid);
 }
 
 function addTask() {
@@ -337,7 +355,7 @@ function addTask() {
 
     addDragAndDrop(newTask);
     updateCounts();
-    saveTasks();
+    saveTasks(firebase.auth().currentUser.uid);
 }
 
 function addDragAndDrop(task) {
@@ -389,7 +407,7 @@ function drop(e) {
     }
     e.target.classList.remove('drag-over');
     updateCounts();
-    saveTasks();
+    saveTasks(firebase.auth().currentUser.uid);
 }
 
 function dragEnd(e) {
@@ -406,13 +424,14 @@ function updateCounts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const user = localStorage.getItem('currentUser');
-    if (user) {
-        updateUserIcon(user);
-        loadTasks(user);
-    }
-    updateCounts();
-    showQuoteModal();
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            updateUserIcon(user.email);
+            loadTasks(user.uid);
+        }
+        updateCounts();
+        showQuoteModal();
+    });
 });
 
 function showQuoteModal() {
