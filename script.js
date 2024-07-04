@@ -135,6 +135,8 @@ function loadTasks(userId) {
                 tasks.done.forEach(task => {
                     createTaskElement(task, 'done-column', true);
                 });
+            } else {
+                console.log("No tasks found!");
             }
         })
         .catch(error => {
@@ -153,6 +155,7 @@ function createTaskElement(task, columnId, isDone = false) {
     taskInput.type = 'text';
     taskInput.value = task.title;
     taskInput.className = 'task-title';
+    taskInput.addEventListener('input', () => saveTasks(firebase.auth().currentUser.uid));
 
     const timeButtons = document.createElement('div');
     timeButtons.className = 'time-buttons';
@@ -322,6 +325,7 @@ function addTask() {
     taskInput.type = 'text';
     taskInput.value = 'New Task';
     taskInput.className = 'task-title';
+    taskInput.addEventListener('input', () => saveTasks(firebase.auth().currentUser.uid));
 
     const timeButtons = document.createElement('div');
     timeButtons.className = 'time-buttons';
