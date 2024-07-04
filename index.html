@@ -28,17 +28,6 @@
             <h2>To-Do</h2>
             <button id="add-task-button">+</button>
         </div>
-        <div class="todo-item" draggable="true" id="task-0">
-            <input type="text" value="Task 1" class="task-title">
-            <div class="time-buttons">
-                <button onclick="startTimer(15, this)">15m</button>
-                <button onclick="startTimer(30, this)">30m</button>
-                <button onclick="startTimer(60, this)">60m</button>
-            </div>
-            <button onclick="markAsDone(this)">✓</button>
-            <button onclick="markAsOnHold(this)">On-Hold</button>
-            <button onclick="deleteTask(this)" class="delete-button">x</button>
-        </div>
     </div>
     <div class="column" id="onhold-column">
         <h2>On-Hold</h2>

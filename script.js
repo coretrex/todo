@@ -108,6 +108,7 @@ function markAsDone(button) {
     button.remove();
     document.getElementById('done-column').appendChild(task);
     updateCounts();
+    saveTasks();
 }
 
 function markAsOnHold(button) {
@@ -115,12 +116,14 @@ function markAsOnHold(button) {
     const task = button.parentElement;
     document.getElementById('onhold-column').appendChild(task);
     updateCounts();
+    saveTasks();
 }
 
 function deleteTask(button) {
     const task = button.parentElement;
     task.remove();
     updateCounts();
+    saveTasks();
 }
 
 function addTask() {
@@ -167,6 +170,7 @@ function addTask() {
 
     addDragAndDrop(newTask);
     updateCounts();
+    saveTasks();
 }
 
 function addDragAndDrop(task) {
@@ -218,6 +222,7 @@ function drop(e) {
     }
     e.target.classList.remove('drag-over');
     updateCounts();
+    saveTasks();
 }
 
 function dragEnd(e) {
@@ -234,10 +239,105 @@ function updateCounts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    loadTasks();
     updateCounts();
-    addDragAndDrop(document.getElementById('task-0'));
     showQuoteModal();
 });
+
+function saveTasks() {
+    const tasks = {
+        todo: [],
+        onhold: [],
+        done: []
+    };
+
+    document.querySelectorAll('#todo-column .todo-item').forEach(item => {
+        tasks.todo.push({
+            id: item.id,
+            title: item.querySelector('.task-title').value
+        });
+    });
+
+    document.querySelectorAll('#onhold-column .todo-item').forEach(item => {
+        tasks.onhold.push({
+            id: item.id,
+            title: item.querySelector('.task-title').value
+        });
+    });
+
+    document.querySelectorAll('#done-column .done-item').forEach(item => {
+        tasks.done.push({
+            id: item.id,
+            title: item.querySelector('.task-title').value
+        });
+    });
+
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function loadTasks() {
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+        const tasks = JSON.parse(savedTasks);
+
+        tasks.todo.forEach(task => {
+            createTaskElement(task, 'todo-column');
+        });
+
+        tasks.onhold.forEach(task => {
+            createTaskElement(task, 'onhold-column');
+        });
+
+        tasks.done.forEach(task => {
+            createTaskElement(task, 'done-column', true);
+        });
+    }
+}
+
+function createTaskElement(task, columnId, isDone = false) {
+    const column = document.getElementById(columnId);
+    const newTask = document.createElement('div');
+    newTask.className = isDone ? 'todo-item done-item' : 'todo-item';
+    newTask.draggable = true;
+    newTask.id = task.id;
+
+    const taskInput = document.createElement('input');
+    taskInput.type = 'text';
+    taskInput.value = task.title;
+    taskInput.className = 'task-title';
+
+    const timeButtons = document.createElement('div');
+    timeButtons.className = 'time-buttons';
+
+    [15, 30, 60].forEach(time => {
+        const button = document.createElement('button');
+        button.textContent = `${time}m`;
+        button.onclick = () => startTimer(time, button);
+        timeButtons.appendChild(button);
+    });
+
+    const doneButton = document.createElement('button');
+    doneButton.textContent = '✓';
+    doneButton.onclick = () => markAsDone(doneButton);
+
+    const onHoldButton = document.createElement('button');
+    onHoldButton.textContent = 'On-Hold';
+    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'x';
+    deleteButton.className = 'delete-button';
+    deleteButton.onclick = () => deleteTask(deleteButton);
+
+    newTask.appendChild(taskInput);
+    newTask.appendChild(timeButtons);
+    if (!isDone) newTask.appendChild(doneButton);
+    newTask.appendChild(onHoldButton);
+    newTask.appendChild(deleteButton);
+    column.appendChild(newTask);
+
+    addDragAndDrop(newTask);
+}
 
 function showQuoteModal() {
     const modal = document.getElementById('quote-modal');
