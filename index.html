@@ -6,11 +6,18 @@
     <title>To-Do Page</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
 </head>
 <body>
 
 <header>
     <h1 id="header-title">To-Do List</h1>
+    <div id="login-container">
+        <button id="login-button">Login with Google</button>
+        <button id="logout-button" class="hidden">Logout</button>
+    </div>
     <div id="timer-container">
         <div id="timer">00:00</div>
         <button id="stop-timer-button">Stop Timer</button>
