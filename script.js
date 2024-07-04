@@ -1,71 +1,80 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+// script.js
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyC7nq_DFrbGn2xXa5rdZS5PCLFo9MZshfE",
-  authDomain: "to-do-ef6b1.firebaseapp.com",
-  projectId: "to-do-ef6b1",
-  storageBucket: "to-do-ef6b1.appspot.com",
-  messagingSenderId: "496601988819",
-  appId: "1:496601988819:web:f513accc13d85a4565de26",
-  measurementId: "G-86BND58QD5"
-};
+let timer;
+let currentTaskElement;
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = getAuth();
-const db = getFirestore();
-
-let userId = null;
-
-document.getElementById('login-button').addEventListener('click', googleLogin);
-document.getElementById('logout-button').addEventListener('click', logout);
-
-function googleLogin() {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider).then((result) => {
-        userId = result.user.uid;
-        document.getElementById('login-button').classList.add('hidden');
-        document.getElementById('logout-button').classList.remove('hidden');
-        loadTasks();
-    }).catch((error) => {
-        console.log(error);
-    });
-}
-
-function logout() {
-    signOut(auth).then(() => {
-        userId = null;
-        document.getElementById('login-button').classList.remove('hidden');
-        document.getElementById('logout-button').classList.add('hidden');
-        clearTasks();
-    }).catch((error) => {
-        console.log(error);
-    });
-}
-
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        userId = user.uid;
-        document.getElementById('login-button').classList.add('hidden');
-        document.getElementById('logout-button').classList.remove('hidden');
-        loadTasks();
-    } else {
-        userId = null;
-        document.getElementById('login-button').classList.remove('hidden');
-        document.getElementById('logout-button').classList.add('hidden');
-        clearTasks();
-    }
+document.getElementById('login-button').addEventListener('click', () => {
+    document.getElementById('login-modal').style.display = 'block';
 });
 
-function saveTasks() {
-    if (!userId) return;
+document.getElementById('login-close').addEventListener('click', () => {
+    document.getElementById('login-modal').style.display = 'none';
+});
 
+document.getElementById('show-register').addEventListener('click', () => {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'block';
+});
+
+document.getElementById('login-submit').addEventListener('click', signIn);
+document.getElementById('register-submit').addEventListener('click', signUp);
+document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
+document.getElementById('logout-button').addEventListener('click', logOut);
+
+function signUp() {
+    const email = document.getElementById('register-email').value;
+    const password = document.getElementById('register-password').value;
+    if (email && password) {
+        if (localStorage.getItem(`user_${email}`)) {
+            alert('User already exists. Please log in.');
+        } else {
+            localStorage.setItem(`user_${email}`, JSON.stringify({ email, password }));
+            alert('User registered successfully!');
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('login-form').style.display = 'block';
+        }
+    } else {
+        alert('Please enter both email and password.');
+    }
+}
+
+function signIn() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const user = JSON.parse(localStorage.getItem(`user_${email}`));
+    if (user && user.password === password) {
+        alert('Sign in successful!');
+        localStorage.setItem('currentUser', email);
+        document.getElementById('login-modal').style.display = 'none';
+        updateUserIcon(email);
+        loadTasks(email);
+    } else {
+        alert('Invalid email or password.');
+    }
+}
+
+function updateUserIcon(email) {
+    const loginButton = document.getElementById('login-button');
+    const userMenu = document.getElementById('user-menu');
+    const userIcon = document.getElementById('user-icon');
+    loginButton.style.display = 'none';
+    userIcon.textContent = email.charAt(0).toUpperCase();
+    userMenu.style.display = 'flex';
+}
+
+function toggleUserMenu() {
+    const logoutButton = document.getElementById('logout-button');
+    logoutButton.style.display = logoutButton.style.display === 'block' ? 'none' : 'block';
+}
+
+function logOut() {
+    localStorage.removeItem('currentUser');
+    document.getElementById('user-menu').style.display = 'none';
+    document.getElementById('login-button').style.display = 'block';
+    alert('You have been logged out.');
+}
+
+function saveTasks(userId) {
     const tasks = {
         todo: [],
         onhold: [],
@@ -93,47 +102,26 @@ function saveTasks() {
         });
     });
 
-    setDoc(doc(db, "users", userId), tasks).catch((error) => {
-        console.log("Error saving tasks: ", error);
-    });
+    localStorage.setItem(`tasks_${userId}`, JSON.stringify(tasks));
 }
 
-function loadTasks() {
-    if (!userId) return;
+function loadTasks(userId) {
+    const savedTasks = localStorage.getItem(`tasks_${userId}`);
+    if (savedTasks) {
+        const tasks = JSON.parse(savedTasks);
 
-    getDoc(doc(db, "users", userId)).then((docSnap) => {
-        if (docSnap.exists()) {
-            const tasks = docSnap.data();
-            clearTasks();
+        tasks.todo.forEach(task => {
+            createTaskElement(task, 'todo-column');
+        });
 
-            tasks.todo.forEach(task => {
-                createTaskElement(task, 'todo-column');
-            });
+        tasks.onhold.forEach(task => {
+            createTaskElement(task, 'onhold-column');
+        });
 
-            tasks.onhold.forEach(task => {
-                createTaskElement(task, 'onhold-column');
-            });
-
-            tasks.done.forEach(task => {
-                createTaskElement(task, 'done-column', true);
-            });
-
-            updateCounts();
-        }
-    }).catch((error) => {
-        console.log("Error loading tasks: ", error);
-    });
-}
-
-function clearTasks() {
-    document.getElementById('todo-column').innerHTML = `
-        <div class="todo-header">
-            <h2>To-Do</h2>
-            <button id="add-task-button">+</button>
-        </div>`;
-    document.getElementById('onhold-column').innerHTML = `<h2>On-Hold</h2>`;
-    document.getElementById('done-column').innerHTML = `<h2>Done</h2>`;
-    document.getElementById('add-task-button').addEventListener('click', addTask);
+        tasks.done.forEach(task => {
+            createTaskElement(task, 'done-column', true);
+        });
+    }
 }
 
 function createTaskElement(task, columnId, isDone = false) {
@@ -179,6 +167,49 @@ function createTaskElement(task, columnId, isDone = false) {
     column.appendChild(newTask);
 
     addDragAndDrop(newTask);
+}
+
+document.getElementById('add-task-button').addEventListener('click', addTask);
+document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
+document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
+
+function getRandomQuote() {
+    const quotes = [
+        "When you think you're done, you're only at 40% of your body's capability. - David Goggins",
+        "Pain unlocks a secret doorway in the mind, one that leads to both peak performance and beautiful silence. - David Goggins",
+        "Be more than motivated, be more than driven, become literally obsessed to the point where people think you’re insane. - David Goggins",
+        "Greatness pulls mediocrity into the mud. Get out there and get after it. - David Goggins",
+        "We don't rise to the level of our expectations, we fall to the level of our training. - David Goggins",
+        "You are in danger of living a life so comfortable and soft, that you will die without ever realizing your true potential. - David Goggins",
+        "Don’t stop when you’re tired. Stop when you’re done. - David Goggins",
+        "Every day you have to do this. You have to do this. Because why not? - David Goggins",
+        "You have to build calluses on your brain just like how you build calluses on your hands. Callus your mind through pain and suffering. - David Goggins",
+        "You will never learn from people if you always tap dance around the truth. - David Goggins",
+        "It's okay, you’re not going to die. At the end of pain is success. - David Goggins",
+        "Suffering is a test. That's all it is. Suffering is the true test of life. - David Goggins",
+        "No matter what avenue I chose, I wanted to be the very best at that avenue. - David Goggins",
+        "You have to master your mind to master the pain and suffering. - David Goggins",
+        "The only way to reach the other side of this journey is to suffer. - David Goggins",
+        "This is not about getting better than someone else, this is about being the best you. - David Goggins",
+        "Everything in life is a mind game! Whenever we get swept under by life's dramas, large and small, we are forgetting that no matter how bad the pain gets, no matter how harrowing the torture, all bad things end. - David Goggins",
+        "If you can see yourself doing something, you can do it. If you can't see yourself doing it, usually you can't achieve it. - David Goggins",
+        "You have to be willing to suffer to get to the other side of greatness. - David Goggins",
+        "Motivation is crap. Motivation comes and goes. When you’re driven, whatever is in front of you will get destroyed. - David Goggins",
+        "The only way to achieve the impossible is to believe it is possible. - Charles Kingsleigh",
+        "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
+        "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
+        "It does not matter how slowly you go as long as you do not stop. - Confucius",
+        "The harder the conflict, the greater the triumph. - George Washington",
+        "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+        "It is hard to fail, but it is worse never to have tried to succeed. - Theodore Roosevelt",
+        "Do not pray for easy lives. Pray to be stronger men. - John F. Kennedy",
+        "The way to get started is to quit talking and begin doing. - Walt Disney",
+        "The only limit to our realization of tomorrow is our doubts of today. - Franklin D. Roosevelt",
+        "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
+        "The only thing standing between you and your goal is the story you keep telling yourself as to why you can't achieve it. - Jordan Belfort"
+    ];
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    return quotes[randomIndex];
 }
 
 function startTimer(minutes, button) {
@@ -375,9 +406,13 @@ function updateCounts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    showQuoteModal();
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+        updateUserIcon(user);
+        loadTasks(user);
+    }
     updateCounts();
-    document.getElementById('add-task-button').addEventListener('click', addTask);
+    showQuoteModal();
 });
 
 function showQuoteModal() {
