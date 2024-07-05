@@ -28,6 +28,10 @@ document.getElementById('login-submit').addEventListener('click', signIn);
 document.getElementById('register-submit').addEventListener('click', signUp);
 document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
 document.getElementById('logout-button').addEventListener('click', logOut);
+document.getElementById('done-timer-button').addEventListener('click', doneTimer);
+document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
+
+
 
 // Function for user registration
 function signUp() {
@@ -166,11 +170,12 @@ function loadTasks(userId) {
 }
 
 // Function to create task elements in the UI
+// Function to create task elements in the UI
 function createTaskElement(task, columnId, isDone = false) {
     const column = document.getElementById(columnId);
     const newTask = document.createElement('div');
     newTask.className = isDone ? 'todo-item done-item' : 'todo-item';
-    newTask.draggable = true;
+    newTask.draggable = !isDone; // Make the task non-draggable if it is done
     newTask.id = task.id;
 
     const taskInput = document.createElement('input');
@@ -189,11 +194,6 @@ function createTaskElement(task, columnId, isDone = false) {
         timeButtons.appendChild(button);
     });
 
-    const doneButton = document.createElement('button');
-    doneButton.textContent = '✓';
-    doneButton.className = 'done-button'; // Add a class for styling
-    doneButton.onclick = () => markAsDone(doneButton);
-
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'x';
     deleteButton.className = 'delete-button';
@@ -204,17 +204,26 @@ function createTaskElement(task, columnId, isDone = false) {
     onHoldButton.className = 'onhold-button'; // Add a class for styling
     onHoldButton.onclick = () => markAsOnHold(onHoldButton);
 
-    // Append buttons in the desired order
+    // Append elements in the desired order
     newTask.appendChild(taskInput);
     newTask.appendChild(timeButtons);
     newTask.appendChild(onHoldButton);
     newTask.appendChild(deleteButton);
-    newTask.appendChild(doneButton);
+
+    // Only add the "Done" button if the task is not already marked as done
+    if (!isDone) {
+        const doneButton = document.createElement('button');
+        doneButton.textContent = '✓';
+        doneButton.className = 'done-button'; // Add a class for styling
+        doneButton.onclick = () => markAsDone(doneButton);
+        newTask.appendChild(doneButton); // Append the "Done" button at the end
+    }
 
     column.appendChild(newTask);
 
     addDragAndDrop(newTask);
 }
+
 
 // Event listeners for adding tasks and stopping the timer
 document.getElementById('add-task-button').addEventListener('click', addTask);
@@ -222,6 +231,7 @@ document.getElementById('stop-timer-button').addEventListener('click', stopTimer
 document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
 document.getElementById('pause-timer-button').addEventListener('click', pauseTimer);
 document.getElementById('start-timer-button').addEventListener('click', () => startTimer(null, null, true));
+
 
 // Function to get a random motivational quote
 function getRandomQuote() {
@@ -261,6 +271,8 @@ function getRandomQuote() {
 
 
 // Modify the startTimer function to handle both initial start and resume
+// Modify the startTimer function in script.js to include the new CSS class
+
 function startTimer(minutes, button, resume = false) {
     clearInterval(timer);
 
@@ -278,7 +290,9 @@ function startTimer(minutes, button, resume = false) {
     currentTaskElement.classList.add('current-task');
     const taskTitleElement = currentTaskElement.querySelector('.task-title');
     const taskTitle = taskTitleElement.value;
-    document.getElementById('header-title').textContent = `Working on: ${taskTitle}`;
+
+    // Apply the new class to the "Working on:" text
+    document.getElementById('header-title').innerHTML = `<span class="working-on-light">Working on:</span> <strong>${taskTitle}</strong>`;
 
     timer = setInterval(() => {
         remainingTime = endTime - Date.now();
@@ -307,7 +321,55 @@ function startTimer(minutes, button, resume = false) {
 
     document.getElementById('pause-timer-button').style.display = 'inline-block';
     document.getElementById('stop-timer-button').style.display = 'inline-block';
+    document.getElementById('done-timer-button').style.display = 'inline-block'; // Show Done button
     document.getElementById('start-timer-button').style.display = 'none';
+}
+
+
+
+function stopTimer() {
+    console.log("stopTimer function called");
+    clearInterval(timer);
+    timerPaused = false;
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('header-title').textContent = 'Task List';
+
+    document.querySelectorAll('.blurred').forEach(element => {
+        element.classList.remove('blurred');
+    });
+
+    if (currentTaskElement) {
+        currentTaskElement.classList.remove('current-task');
+        currentTaskElement = null;
+    }
+
+    document.getElementById('pause-timer-button').style.display = 'none';
+    document.getElementById('start-timer-button').style.display = 'none';
+    document.getElementById('stop-timer-button').style.display = 'none';
+
+    const doneButton = document.getElementById('done-timer-button');
+    if (doneButton) {
+        console.log("Hiding the Done button");
+        doneButton.style.display = 'none'; // Ensure Done button is hidden
+    } else {
+        console.error("Done button not found");
+    }
+}
+
+// Ensure the event listener for the "Stop Timer" button is correctly set
+document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
+
+
+
+function pauseTimer() {
+    clearInterval(timer);
+    timerPaused = true;
+    document.querySelectorAll('.blurred').forEach(element => {
+        element.classList.remove('blurred');
+    });
+
+    document.getElementById('pause-timer-button').style.display = 'none';
+    document.getElementById('start-timer-button').style.display = 'inline-block';
 }
 
 function stopTimer() {
@@ -328,48 +390,38 @@ function stopTimer() {
     document.getElementById('pause-timer-button').style.display = 'none';
     document.getElementById('start-timer-button').style.display = 'none';
     document.getElementById('stop-timer-button').style.display = 'none';
-}
 
-
-function pauseTimer() {
-    clearInterval(timer);
-    timerPaused = true;
-    document.querySelectorAll('.blurred').forEach(element => {
-        element.classList.remove('blurred');
-    });
-
-    document.getElementById('pause-timer-button').style.display = 'none';
-    document.getElementById('start-timer-button').style.display = 'inline-block';
-}
-
-function stopTimer() {
-    clearInterval(timer);
-    timerPaused = false;
-    document.getElementById('timer').textContent = '00:00';
-    document.getElementById('header-title').textContent = 'Task List'; // Ensure this sets the header to "Task List"
-
-    document.querySelectorAll('.blurred').forEach(element => {
-        element.classList.remove('blurred');
-    });
-
-    if (currentTaskElement) {
-        currentTaskElement.classList.remove('current-task');
-        currentTaskElement = null;
+    // Use querySelector as a fallback
+    const doneButton = document.getElementById('done-timer-button') || document.querySelector('#done-timer-button');
+    if (doneButton) {
+        doneButton.style.display = 'none'; // Ensure Done button is hidden
+    } else {
+        console.error("Done button not found");
     }
-
-    document.getElementById('pause-timer-button').style.display = 'none';
-    document.getElementById('start-timer-button').style.display = 'none';
-    document.getElementById('stop-timer-button').style.display = 'none';
 }
+
+// Ensure the event listener for the "Stop Timer" button is correctly set
+document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
+
+
+function doneTimer() {
+    if (currentTaskElement) {
+        const doneButton = currentTaskElement.querySelector('.done-button');
+        markAsDone(doneButton);
+        stopTimer();
+        document.getElementById('done-timer-button').style.display = 'none'; // Hide Done button after clicking
+    }
+}
+
+
 
 
 // Function to mark a task as done
 function markAsDone(button) {
-    stopTimer();
     const task = button.parentElement;
     task.classList.add('done-item');
     task.draggable = false;
-    button.remove();
+    button.remove(); // Remove the "Done" button from the task
     document.getElementById('done-column').appendChild(task);
     updateCounts();
     saveTasks(firebase.auth().currentUser.uid);
@@ -381,6 +433,7 @@ function markAsDone(button) {
         origin: { y: 0.6 }
     });
 }
+
 
 
 // Function to mark a task as on-hold
