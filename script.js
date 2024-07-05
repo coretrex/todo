@@ -1,3 +1,11 @@
+// script.js
+
+let timer;
+let currentTaskElement;
+let timerPaused = false;
+let remainingTime = 0;
+let endTime;
+
 // Initialize Firestore
 const db = firebase.firestore();
 
@@ -23,6 +31,7 @@ document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
 document.getElementById('logout-button').addEventListener('click', logOut);
 document.getElementById('done-timer-button').addEventListener('click', doneTimer);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
+document.getElementById('pause-timer-button').addEventListener('click', pauseTimer); // Add this line
 
 // Function for Google Sign-In
 function signInWithGoogle() {
@@ -316,6 +325,7 @@ document.getElementById('task-input-field').addEventListener('keydown', function
 // Ensure the event listener for the "Stop Timer" button is correctly set
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 
+// Function to start the timer
 function startTimer(minutes, button, resume = false) {
     clearInterval(timer);
 
@@ -368,6 +378,7 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('start-timer-button').style.display = 'none';
 }
 
+// Function to stop the timer
 function stopTimer() {
     clearInterval(timer);
     timerPaused = false;
@@ -395,9 +406,11 @@ function stopTimer() {
     }
 }
 
+// Function to pause the timer
 function pauseTimer() {
     clearInterval(timer);
     timerPaused = true;
+    remainingTime = endTime - Date.now(); // Calculate remaining time
     document.querySelectorAll('.blurred').forEach(element => {
         element.classList.remove('blurred');
     });
@@ -406,6 +419,7 @@ function pauseTimer() {
     document.getElementById('start-timer-button').style.display = 'inline-block';
 }
 
+// Function to mark the task as done
 function doneTimer() {
     if (currentTaskElement) {
         const doneButton = currentTaskElement.querySelector('.done-button');
