@@ -20,7 +20,6 @@ const quotes = [
     "Don't stop when you're tired. Stop when you're done.",
     "Discipline is the shortcut. If you want to make it big, you have to stay disciplined every single day.",
     "Success isn’t owned, it’s leased. And rent is due every day."
-    "Work so hard that one day your signature will be called an autograph."
 ];
 
 // Function to get a random quote
