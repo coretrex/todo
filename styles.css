@@ -35,6 +35,7 @@ header #header-title {
 }
 
 #stop-timer-button {
+    font-family: 'Poppins', sans-serif;
     font-size: 16px;
     padding: 10px 20px;
     margin-top: 10px;
@@ -91,7 +92,7 @@ h2 {
 }
 
 #add-task-button {
-    background-color: #5cb85c;
+    background-color: #5566e6;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -106,7 +107,7 @@ h2 {
 }
 
 #add-task-button:hover {
-    background-color: #4cae4c;
+    background-color: #0720de;
 }
 
 .todo-item, .done-item {
@@ -358,3 +359,30 @@ h2 {
 .link:hover {
     text-decoration: underline;
 }
+
+/* styles.css */
+#pause-timer-button, #start-timer-button {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #f0ad4e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#pause-timer-button:hover {
+    background-color: #ec971f;
+}
+
+#start-timer-button {
+    background-color: #5cb85c;
+    color: white;
+}
+
+#start-timer-button:hover {
+    background-color: #4da14d;
+}
+

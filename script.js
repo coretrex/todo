@@ -2,6 +2,9 @@
 
 let timer;
 let currentTaskElement;
+let timerPaused = false;
+let remainingTime = 0;
+let endTime;
 
 // Initialize Firestore
 const db = firebase.firestore();
@@ -217,6 +220,8 @@ function createTaskElement(task, columnId, isDone = false) {
 document.getElementById('add-task-button').addEventListener('click', addTask);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
+document.getElementById('pause-timer-button').addEventListener('click', pauseTimer);
+document.getElementById('start-timer-button').addEventListener('click', () => startTimer(null, null, true));
 
 // Function to get a random motivational quote
 function getRandomQuote() {
@@ -229,7 +234,7 @@ function getRandomQuote() {
         "You are in danger of living a life so comfortable and soft, that you will die without ever realizing your true potential. - David Goggins",
         "Don’t stop when you’re tired. Stop when you’re done. - David Goggins",
         "Every day you have to do this. You have to do this. Because why not? - David Goggins",
-        "You have to build calluses on your brain just like how you build calluses on your hands. Callus your mind through pain and suffering. - David Goggins",
+        "Callus your mind through pain and suffering. - David Goggins",
         "You will never learn from people if you always tap dance around the truth. - David Goggins",
         "It's okay, you’re not going to die. At the end of pain is success. - David Goggins",
         "Suffering is a test. That's all it is. Suffering is the true test of life. - David Goggins",
@@ -237,10 +242,7 @@ function getRandomQuote() {
         "You have to master your mind to master the pain and suffering. - David Goggins",
         "The only way to reach the other side of this journey is to suffer. - David Goggins",
         "This is not about getting better than someone else, this is about being the best you. - David Goggins",
-        "Everything in life is a mind game! Whenever we get swept under by life's dramas, large and small, we are forgetting that no matter how bad the pain gets, no matter how harrowing the torture, all bad things end. - David Goggins",
-        "If you can see yourself doing something, you can do it. If you can't see yourself doing it, usually you can't achieve it. - David Goggins",
         "You have to be willing to suffer to get to the other side of greatness. - David Goggins",
-        "Motivation is crap. Motivation comes and goes. When you’re driven, whatever is in front of you will get destroyed. - David Goggins",
         "The only way to achieve the impossible is to believe it is possible. - Charles Kingsleigh",
         "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
         "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
@@ -251,39 +253,44 @@ function getRandomQuote() {
         "Do not pray for easy lives. Pray to be stronger men. - John F. Kennedy",
         "The way to get started is to quit talking and begin doing. - Walt Disney",
         "The only limit to our realization of tomorrow is our doubts of today. - Franklin D. Roosevelt",
-        "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Waldo Emerson",
-        "The only thing standing between you and your goal is the story you keep telling yourself as to why you can't achieve it. - Jordan Belfort"
+        "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Emerson",
     ];
     const randomIndex = Math.floor(Math.random() * quotes.length);
     return quotes[randomIndex];
 }
 
-// Function to start the timer for a task
-function startTimer(minutes, button) {
+
+// Modify the startTimer function to handle both initial start and resume
+function startTimer(minutes, button, resume = false) {
     clearInterval(timer);
 
     if (currentTaskElement) {
         currentTaskElement.classList.remove('current-task');
     }
 
-    currentTaskElement = button.parentElement.parentElement;
+    if (!resume) {
+        currentTaskElement = button.parentElement.parentElement;
+        endTime = Date.now() + minutes * 60000;
+    } else {
+        endTime = Date.now() + remainingTime;
+    }
+
     currentTaskElement.classList.add('current-task');
-    
     const taskTitleElement = currentTaskElement.querySelector('.task-title');
     const taskTitle = taskTitleElement.value;
     document.getElementById('header-title').textContent = `Working on: ${taskTitle}`;
 
-    const endTime = Date.now() + minutes * 60000;
     timer = setInterval(() => {
-        const remainingTime = endTime - Date.now();
+        remainingTime = endTime - Date.now();
         if (remainingTime <= 0) {
             clearInterval(timer);
             document.getElementById('timer').textContent = '00:00';
+            stopTimer();
         } else {
             const minutes = Math.floor(remainingTime / 60000);
             const seconds = Math.floor((remainingTime % 60000) / 1000);
-            document.getElementById('timer').textContent = 
-                String(minutes).padStart(2, '0') + ':' + 
+            document.getElementById('timer').textContent =
+                String(minutes).padStart(2, '0') + ':' +
                 String(seconds).padStart(2, '0');
         }
     }, 1000);
@@ -297,13 +304,28 @@ function startTimer(minutes, button) {
     currentTaskElement.querySelectorAll('.task-title').forEach(element => {
         element.classList.remove('blurred');
     });
+
+    document.getElementById('pause-timer-button').style.display = 'inline-block';
+    document.getElementById('stop-timer-button').style.display = 'inline-block';
+    document.getElementById('start-timer-button').style.display = 'none';
 }
 
-// Function to stop the timer
+function pauseTimer() {
+    clearInterval(timer);
+    timerPaused = true;
+    document.querySelectorAll('.blurred').forEach(element => {
+        element.classList.remove('blurred');
+    });
+
+    document.getElementById('pause-timer-button').style.display = 'none';
+    document.getElementById('start-timer-button').style.display = 'inline-block';
+}
+
 function stopTimer() {
     clearInterval(timer);
+    timerPaused = false;
     document.getElementById('timer').textContent = '00:00';
-    document.getElementById('header-title').textContent = 'To-Do List';
+    document.getElementById('header-title').textContent = 'Task List'; // Ensure this sets the header to "Task List"
 
     document.querySelectorAll('.blurred').forEach(element => {
         element.classList.remove('blurred');
@@ -313,7 +335,12 @@ function stopTimer() {
         currentTaskElement.classList.remove('current-task');
         currentTaskElement = null;
     }
+
+    document.getElementById('pause-timer-button').style.display = 'none';
+    document.getElementById('start-timer-button').style.display = 'none';
+    document.getElementById('stop-timer-button').style.display = 'none';
 }
+
 
 // Function to mark a task as done
 function markAsDone(button) {
