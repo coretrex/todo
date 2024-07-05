@@ -137,7 +137,7 @@ h2 {
 
 .time-buttons button {
     font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
-    margin: 0 5px;
+    margin: 0 3px;
     background-color: #e6e6e6; /* Deep purple color */
     color: #6e6e6e;
     border: none;
@@ -151,6 +151,53 @@ h2 {
     background-color: #3a006a; /* A slightly darker shade for hover effect */
     color: white;
 }
+
+
+/* styles.css */
+
+/* styles.css */
+
+/* Adjust the container holding the buttons */
+.time-buttons {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    gap: 0px; /* Adjust the gap between buttons */
+    margin-right: 0; /* Remove any right margin */
+}
+
+.time-buttons button:last-child {
+    margin-right: 5px; /* Adjust the padding value as needed */
+}
+
+/* Adjust the task item container */
+.todo-item, .done-item {
+    display: flex;
+    justify-content: flex-start; /* Align items to the left */
+    align-items: center;
+    padding: 7px;
+    margin: 5px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: grab;
+    background-color: #f9f9f9;
+}
+
+/* Adjusting the spacing of the buttons */
+.delete-button,
+.done-button,
+.onhold-button {
+    margin-left: 5px; /* Add spacing to the left */
+    margin-right: 0; /* Remove any right margin */
+}
+
+.task-title {
+    flex-grow: 1; /* Allow task title to take available space */
+    white-space: normal; /* Allow text to wrap */
+    overflow-wrap: break-word; /* Break long words */
+}
+
+
+
 
 .delete-button {
     background-color: #d9534f;
@@ -169,7 +216,7 @@ h2 {
     background-color: #5cb85c;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 4px 8px;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 5px; /* Add margin to the left for spacing */
@@ -184,16 +231,25 @@ h2 {
     font-size: 12px;
     border: 1px solid #bbbbbd; /* Border color set to #8f8f8f */
     border-radius: 5px; /* Make the button round */
-    margin-right: 5px;
     cursor: pointer;
     background-color: #f2f2f2; /* Default background color */
     color: #000; /* Default text color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .onhold-button:hover {
     background-color: #e0e0e0; /* Darker purple color */
     color: #000; /* White text color */
 }
+
+.onhold-button::before {
+    content: '\270B'; /* Unicode for hand stop gesture */
+    font-size: 15px;
+}
+
+
 
 .drag-over {
     border: 2px dashed #ccc;
@@ -450,4 +506,68 @@ h2 {
     background-color: #4cae4c;
 }
 
+.delete-button,
+.done-button {
+    margin: 0 2px; /* Adjust the spacing between buttons */
+}
 
+.onhold-button {
+    margin: 0 2px; /* Adjust the spacing between buttons */
+}
+
+/* Additional CSS to ensure the buttons are aligned properly */
+.todo-item, .done-item {
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the left */
+    align-items: center;
+}
+
+.time-buttons {
+    margin-right: auto; /* Pushes the time buttons to the left */
+}
+
+
+.common-button {
+    width: 60px;  /* Set the desired width */
+    height: 40px; /* Set the desired height */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    margin: 0 2px;
+    font-size: 14px;  /* Adjust font size if necessary */
+    font-family: 'Poppins', sans-serif;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+}
+/* Task Input Modal Styles */
+.task-input-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    z-index: 1001;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    display: none;
+    width: 100%; /* Increase the width of the modal */
+    max-width: 400px; /* Set a maximum width */
+}
+
+.task-input-field {
+    width: 90%;
+    font-size: 20px;
+    border: none;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Blur Effect */
+body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
+    filter: blur(5px);
+    pointer-events: none;
+}

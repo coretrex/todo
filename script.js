@@ -31,8 +31,6 @@ document.getElementById('logout-button').addEventListener('click', logOut);
 document.getElementById('done-timer-button').addEventListener('click', doneTimer);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 
-
-
 // Function for user registration
 function signUp() {
     const email = document.getElementById('register-email').value;
@@ -170,12 +168,11 @@ function loadTasks(userId) {
 }
 
 // Function to create task elements in the UI
-// Function to create task elements in the UI
 function createTaskElement(task, columnId, isDone = false) {
     const column = document.getElementById(columnId);
     const newTask = document.createElement('div');
     newTask.className = isDone ? 'todo-item done-item' : 'todo-item';
-    newTask.draggable = !isDone; // Make the task non-draggable if it is done
+    newTask.draggable = true;
     newTask.id = task.id;
 
     const taskInput = document.createElement('input');
@@ -199,79 +196,117 @@ function createTaskElement(task, columnId, isDone = false) {
     deleteButton.className = 'delete-button';
     deleteButton.onclick = () => deleteTask(deleteButton);
 
-    const onHoldButton = document.createElement('button');
-    onHoldButton.textContent = 'On-Hold';
-    onHoldButton.className = 'onhold-button'; // Add a class for styling
-    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
-
-    // Append elements in the desired order
     newTask.appendChild(taskInput);
     newTask.appendChild(timeButtons);
-    newTask.appendChild(onHoldButton);
-    newTask.appendChild(deleteButton);
 
-    // Only add the "Done" button if the task is not already marked as done
-    if (!isDone) {
+    if (!isDone && columnId !== 'onhold-column') {
+        const onHoldButton = document.createElement('button');
+        onHoldButton.className = 'onhold-button';
+        onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+        newTask.appendChild(onHoldButton);
+
         const doneButton = document.createElement('button');
         doneButton.textContent = '✓';
-        doneButton.className = 'done-button'; // Add a class for styling
+        doneButton.className = 'done-button';
         doneButton.onclick = () => markAsDone(doneButton);
-        newTask.appendChild(doneButton); // Append the "Done" button at the end
+        newTask.appendChild(doneButton);
+    } else if (columnId === 'onhold-column') {
+        const doneButton = document.createElement('button');
+        doneButton.textContent = '✓';
+        doneButton.className = 'done-button';
+        doneButton.onclick = () => markAsDone(doneButton);
+        newTask.appendChild(doneButton);
     }
 
+    newTask.appendChild(deleteButton);
     column.appendChild(newTask);
 
     addDragAndDrop(newTask);
 }
 
 
-// Event listeners for adding tasks and stopping the timer
-document.getElementById('add-task-button').addEventListener('click', addTask);
-document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
-document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
-document.getElementById('pause-timer-button').addEventListener('click', pauseTimer);
-document.getElementById('start-timer-button').addEventListener('click', () => startTimer(null, null, true));
+// Function to add a new task
+function addTask(taskTitle) {
+    const todoColumn = document.getElementById('todo-column');
+    const newTask = document.createElement('div');
+    newTask.className = 'todo-item';
+    newTask.draggable = true;
+    newTask.id = 'task-' + new Date().getTime();
 
+    const taskInput = document.createElement('input');
+    taskInput.type = 'text';
+    taskInput.value = taskTitle;
+    taskInput.className = 'task-title';
+    taskInput.addEventListener('input', () => saveTasks(firebase.auth().currentUser.uid));
 
-// Function to get a random motivational quote
-function getRandomQuote() {
-    const quotes = [
-        "When you think you're done, you're only at 40% of your body's capability. - David Goggins",
-        "Pain unlocks a secret doorway in the mind, one that leads to both peak performance and beautiful silence. - David Goggins",
-        "Be more than motivated, be more than driven, become literally obsessed to the point where people think you’re insane. - David Goggins",
-        "Greatness pulls mediocrity into the mud. Get out there and get after it. - David Goggins",
-        "We don't rise to the level of our expectations, we fall to the level of our training. - David Goggins",
-        "You are in danger of living a life so comfortable and soft, that you will die without ever realizing your true potential. - David Goggins",
-        "Don’t stop when you’re tired. Stop when you’re done. - David Goggins",
-        "Every day you have to do this. You have to do this. Because why not? - David Goggins",
-        "Callus your mind through pain and suffering. - David Goggins",
-        "You will never learn from people if you always tap dance around the truth. - David Goggins",
-        "It's okay, you’re not going to die. At the end of pain is success. - David Goggins",
-        "Suffering is a test. That's all it is. Suffering is the true test of life. - David Goggins",
-        "No matter what avenue I chose, I wanted to be the very best at that avenue. - David Goggins",
-        "You have to master your mind to master the pain and suffering. - David Goggins",
-        "The only way to reach the other side of this journey is to suffer. - David Goggins",
-        "This is not about getting better than someone else, this is about being the best you. - David Goggins",
-        "You have to be willing to suffer to get to the other side of greatness. - David Goggins",
-        "The only way to achieve the impossible is to believe it is possible. - Charles Kingsleigh",
-        "Success is not final, failure is not fatal: It is the courage to continue that counts. - Winston Churchill",
-        "Hardships often prepare ordinary people for an extraordinary destiny. - C.S. Lewis",
-        "It does not matter how slowly you go as long as you do not stop. - Confucius",
-        "The harder the conflict, the greater the triumph. - George Washington",
-        "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
-        "It is hard to fail, but it is worse never to have tried to succeed. - Theodore Roosevelt",
-        "Do not pray for easy lives. Pray to be stronger men. - John F. Kennedy",
-        "The way to get started is to quit talking and begin doing. - Walt Disney",
-        "The only limit to our realization of tomorrow is our doubts of today. - Franklin D. Roosevelt",
-        "What lies behind us and what lies before us are tiny matters compared to what lies within us. - Ralph Emerson",
-    ];
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    return quotes[randomIndex];
+    const timeButtons = document.createElement('div');
+    timeButtons.className = 'time-buttons';
+
+    [15, 30, 60].forEach(time => {
+        const button = document.createElement('button');
+        button.textContent = `${time}m`;
+        button.onclick = () => startTimer(time, button);
+        timeButtons.appendChild(button);
+    });
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'x';
+    deleteButton.className = 'delete-button';
+    deleteButton.onclick = () => deleteTask(deleteButton);
+
+    const onHoldButton = document.createElement('button');
+    onHoldButton.className = 'onhold-button';
+    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+
+    const doneButton = document.createElement('button');
+    doneButton.textContent = '✓';
+    doneButton.className = 'done-button';
+    doneButton.onclick = () => markAsDone(doneButton);
+
+    newTask.appendChild(taskInput);
+    newTask.appendChild(timeButtons);
+    newTask.appendChild(onHoldButton);
+    newTask.appendChild(deleteButton);
+    newTask.appendChild(doneButton);
+
+    todoColumn.appendChild(newTask);
+
+    addDragAndDrop(newTask);
+    updateCounts();
+    saveTasks(firebase.auth().currentUser.uid);
 }
 
+// Show the task input modal
+function showTaskInputModal() {
+    document.getElementById('task-input-modal').style.display = 'block';
+    document.body.classList.add('blur-effect-enabled');
+    document.getElementById('task-input-field').focus();
+}
 
-// Modify the startTimer function to handle both initial start and resume
-// Modify the startTimer function in script.js to include the new CSS class
+// Hide the task input modal
+function hideTaskInputModal() {
+    document.getElementById('task-input-modal').style.display = 'none';
+    document.body.classList.remove('blur-effect-enabled');
+}
+
+// Add event listener to show the task input modal when the add task button is clicked
+document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+
+// Add event listener to handle task input
+document.getElementById('task-input-field').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        const taskTitle = event.target.value;
+        if (taskTitle.trim() !== '') {
+            createTaskElement({ id: 'task-' + new Date().getTime(), title: taskTitle }, 'todo-column');
+            event.target.value = ''; // Clear the input field
+            hideTaskInputModal();
+            saveTasks(firebase.auth().currentUser.uid);
+        }
+    }
+});
+
+// Ensure the event listener for the "Stop Timer" button is correctly set
+document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 
 function startTimer(minutes, button, resume = false) {
     clearInterval(timer);
@@ -325,10 +360,7 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('start-timer-button').style.display = 'none';
 }
 
-
-
 function stopTimer() {
-    console.log("stopTimer function called");
     clearInterval(timer);
     timerPaused = false;
     document.getElementById('timer').textContent = '00:00';
@@ -349,17 +381,11 @@ function stopTimer() {
 
     const doneButton = document.getElementById('done-timer-button');
     if (doneButton) {
-        console.log("Hiding the Done button");
         doneButton.style.display = 'none'; // Ensure Done button is hidden
     } else {
         console.error("Done button not found");
     }
 }
-
-// Ensure the event listener for the "Stop Timer" button is correctly set
-document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
-
-
 
 function pauseTimer() {
     clearInterval(timer);
@@ -372,38 +398,6 @@ function pauseTimer() {
     document.getElementById('start-timer-button').style.display = 'inline-block';
 }
 
-function stopTimer() {
-    clearInterval(timer);
-    timerPaused = false;
-    document.getElementById('timer').textContent = '00:00';
-    document.getElementById('header-title').textContent = 'Task List';
-
-    document.querySelectorAll('.blurred').forEach(element => {
-        element.classList.remove('blurred');
-    });
-
-    if (currentTaskElement) {
-        currentTaskElement.classList.remove('current-task');
-        currentTaskElement = null;
-    }
-
-    document.getElementById('pause-timer-button').style.display = 'none';
-    document.getElementById('start-timer-button').style.display = 'none';
-    document.getElementById('stop-timer-button').style.display = 'none';
-
-    // Use querySelector as a fallback
-    const doneButton = document.getElementById('done-timer-button') || document.querySelector('#done-timer-button');
-    if (doneButton) {
-        doneButton.style.display = 'none'; // Ensure Done button is hidden
-    } else {
-        console.error("Done button not found");
-    }
-}
-
-// Ensure the event listener for the "Stop Timer" button is correctly set
-document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
-
-
 function doneTimer() {
     if (currentTaskElement) {
         const doneButton = currentTaskElement.querySelector('.done-button');
@@ -413,15 +407,20 @@ function doneTimer() {
     }
 }
 
-
-
-
-// Function to mark a task as done
 function markAsDone(button) {
     const task = button.parentElement;
     task.classList.add('done-item');
     task.draggable = false;
-    button.remove(); // Remove the "Done" button from the task
+
+    // Hide the "On-Hold" button
+    const onHoldButton = task.querySelector('.onhold-button');
+    if (onHoldButton) {
+        onHoldButton.style.display = 'none';
+    }
+
+    // Remove the "Done" button
+    button.remove();
+
     document.getElementById('done-column').appendChild(task);
     updateCounts();
     saveTasks(firebase.auth().currentUser.uid);
@@ -434,18 +433,27 @@ function markAsDone(button) {
     });
 }
 
-
-
-// Function to mark a task as on-hold
 function markAsOnHold(button) {
     stopTimer();
     const task = button.parentElement;
+
+    // Hide the "On-Hold" button
+    const onHoldButton = task.querySelector('.onhold-button');
+    if (onHoldButton) {
+        onHoldButton.style.display = 'none';
+    }
+
+    // Ensure the "Done" button is displayed
+    const doneButton = task.querySelector('.done-button');
+    if (doneButton) {
+        doneButton.style.display = 'inline-block';
+    }
+
     document.getElementById('onhold-column').appendChild(task);
     updateCounts();
     saveTasks(firebase.auth().currentUser.uid);
 }
 
-// Function to delete a task
 function deleteTask(button) {
     const task = button.parentElement;
     task.remove();
@@ -453,66 +461,12 @@ function deleteTask(button) {
     saveTasks(firebase.auth().currentUser.uid);
 }
 
-// Function to add a new task
-function addTask() {
-    const todoColumn = document.getElementById('todo-column');
-    const newTask = document.createElement('div');
-    newTask.className = 'todo-item';
-    newTask.draggable = true;
-    newTask.id = 'task-' + new Date().getTime();
-
-    const taskInput = document.createElement('input');
-    taskInput.type = 'text';
-    taskInput.value = 'New Task';
-    taskInput.className = 'task-title';
-    taskInput.addEventListener('input', () => saveTasks(firebase.auth().currentUser.uid));
-
-    const timeButtons = document.createElement('div');
-    timeButtons.className = 'time-buttons';
-
-    [15, 30, 60].forEach(time => {
-        const button = document.createElement('button');
-        button.textContent = `${time}m`;
-        button.onclick = () => startTimer(time, button);
-        timeButtons.appendChild(button);
-    });
-
-    const doneButton = document.createElement('button');
-    doneButton.textContent = '✓';
-    doneButton.className = 'done-button'; // Add a class for styling
-    doneButton.onclick = () => markAsDone(doneButton);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'x';
-    deleteButton.className = 'delete-button';
-    deleteButton.onclick = () => deleteTask(deleteButton);
-
-    const onHoldButton = document.createElement('button');
-    onHoldButton.textContent = 'On-Hold';
-    onHoldButton.className = 'onhold-button'; // Add a class for styling
-    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
-
-    // Append buttons in the desired order
-    newTask.appendChild(taskInput);
-    newTask.appendChild(timeButtons);
-    newTask.appendChild(onHoldButton);
-    newTask.appendChild(deleteButton);
-    newTask.appendChild(doneButton);
-
-    todoColumn.appendChild(newTask);
-
-    addDragAndDrop(newTask);
-    updateCounts();
-    saveTasks(firebase.auth().currentUser.uid);
-}
-
-// Function to add drag-and-drop functionality to tasks
 function addDragAndDrop(task) {
     task.addEventListener('dragstart', dragStart);
     task.addEventListener('dragend', dragEnd);
 }
 
-document.querySelectorAll('.todo-item').forEach(item => {
+document.querySelectorAll('.todo-item, .done-item').forEach(item => {
     addDragAndDrop(item);
 });
 
@@ -523,7 +477,6 @@ document.querySelectorAll('.column').forEach(column => {
     column.addEventListener('drop', drop);
 });
 
-// Functions for drag-and-drop
 function dragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.id);
     setTimeout(() => {
@@ -554,6 +507,19 @@ function drop(e) {
     const draggable = document.getElementById(id);
     if (e.target.classList.contains('column')) {
         e.target.appendChild(draggable);
+        // Show/hide appropriate buttons
+        const onHoldButton = draggable.querySelector('.onhold-button');
+        const doneButton = draggable.querySelector('.done-button');
+        if (e.target.id === 'done-column') {
+            if (onHoldButton) onHoldButton.style.display = 'none';
+            if (doneButton) doneButton.style.display = 'none';
+        } else if (e.target.id === 'onhold-column') {
+            if (onHoldButton) onHoldButton.style.display = 'none'; // Hide the "On-Hold" button immediately
+            if (doneButton) doneButton.style.display = 'inline-block';
+        } else {
+            if (onHoldButton) onHoldButton.style.display = 'inline-block';
+            if (doneButton) doneButton.style.display = 'inline-block';
+        }
     }
     e.target.classList.remove('drag-over');
     updateCounts();
@@ -567,14 +533,13 @@ function dragEnd(e) {
     });
 }
 
-// Function to update task counts
+
 function updateCounts() {
     document.getElementById('tasks-count').textContent = document.getElementById('todo-column').querySelectorAll('.todo-item').length;
     document.getElementById('onhold-count').textContent = document.getElementById('onhold-column').querySelectorAll('.todo-item').length;
     document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
 }
 
-// Event listener for DOM content loaded
 document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
@@ -588,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Function to show motivational quote modal
+
 function showQuoteModal() {
     const modal = document.getElementById('quote-modal');
     const quoteElement = document.getElementById('motivational-quote');
@@ -596,8 +561,36 @@ function showQuoteModal() {
     modal.classList.add('show');
 }
 
-// Function to close motivational quote modal
 function closeQuoteModal() {
     const modal = document.getElementById('quote-modal');
     modal.classList.remove('show');
 }
+
+// Show the task input modal
+function showTaskInputModal() {
+    document.getElementById('task-input-modal').style.display = 'block';
+    document.body.classList.add('blur-effect-enabled');
+    document.getElementById('task-input-field').focus();
+}
+
+// Hide the task input modal
+function hideTaskInputModal() {
+    document.getElementById('task-input-modal').style.display = 'none';
+    document.body.classList.remove('blur-effect-enabled');
+}
+
+// Add event listener to show the task input modal when the add task button is clicked
+document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+
+// Add event listener to handle task input
+document.getElementById('task-input-field').addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        const taskTitle = event.target.value;
+        if (taskTitle.trim() !== '') {
+            createTaskElement({ id: 'task-' + new Date().getTime(), title: taskTitle }, 'todo-column');
+            event.target.value = ''; // Clear the input field
+            hideTaskInputModal();
+            saveTasks(firebase.auth().currentUser.uid);
+        }
+    }
+});

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do Page</title>
     <link rel="stylesheet" href="styles.css">
-   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;400;600&display=swap" rel="stylesheet">
     <!-- Firebase Configuration Scripts -->
     <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-auth.js"></script>
@@ -31,11 +31,11 @@
     <div id="timer-container">
         <div id="timer">00:00</div>
         <div id="button-container">
-    <button id="stop-timer-button" style="display: none;">Stop Timer</button>
-    <button id="pause-timer-button" style="display: none;">Pause Timer</button>
-    <button id="start-timer-button" style="display: none;">Start Timer</button>
-    <button id="done-timer-button" style="display: none;">Done</button>
-    </div>
+            <button id="stop-timer-button" style="display: none;">Stop Timer</button>
+            <button id="pause-timer-button" style="display: none;">Pause Timer</button>
+            <button id="start-timer-button" style="display: none;">Start Timer</button>
+            <button id="done-timer-button" style="display: none;">Done</button>
+        </div>
     </div>
     <div class="metrics">
         <div>Tasks: <span id="tasks-count">0</span></div>
@@ -73,6 +73,11 @@
     </div>
 </div>
 
+<!-- Task Input Modal -->
+<div id="task-input-modal" class="task-input-modal">
+    <input type="text" id="task-input-field" class="task-input-field" placeholder="Type your task and press Enter">
+</div>
+
 <!-- Login/Register Modal -->
 <div id="login-modal" class="modal">
     <div class="modal-content">
@@ -95,5 +100,7 @@
 
 <script src="script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+
+
 </body>
 </html>
