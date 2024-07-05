@@ -6,6 +6,7 @@ let currentTaskElement;
 // Initialize Firestore
 const db = firebase.firestore();
 
+// Event listeners for login modal
 document.getElementById('login-button').addEventListener('click', () => {
     document.getElementById('login-modal').style.display = 'block';
 });
@@ -19,11 +20,13 @@ document.getElementById('show-register').addEventListener('click', () => {
     document.getElementById('register-form').style.display = 'block';
 });
 
+// Event listeners for login and registration
 document.getElementById('login-submit').addEventListener('click', signIn);
 document.getElementById('register-submit').addEventListener('click', signUp);
 document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
 document.getElementById('logout-button').addEventListener('click', logOut);
 
+// Function for user registration
 function signUp() {
     const email = document.getElementById('register-email').value;
     const password = document.getElementById('register-password').value;
@@ -42,6 +45,7 @@ function signUp() {
     }
 }
 
+// Function for user login
 function signIn() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
@@ -57,6 +61,7 @@ function signIn() {
         });
 }
 
+// Function to update user icon after login
 function updateUserIcon(email) {
     const loginButton = document.getElementById('login-button');
     const userMenu = document.getElementById('user-menu');
@@ -66,11 +71,13 @@ function updateUserIcon(email) {
     userMenu.style.display = 'flex';
 }
 
+// Function to toggle user menu
 function toggleUserMenu() {
     const logoutButton = document.getElementById('logout-button');
     logoutButton.style.display = logoutButton.style.display === 'block' ? 'none' : 'block';
 }
 
+// Function for user logout
 function logOut() {
     firebase.auth().signOut().then(() => {
         document.getElementById('user-menu').style.display = 'none';
@@ -82,12 +89,14 @@ function logOut() {
     });
 }
 
+// Function to clear tasks from the UI
 function clearTasks() {
     document.getElementById('todo-column').innerHTML = '';
     document.getElementById('onhold-column').innerHTML = '';
     document.getElementById('done-column').innerHTML = '';
 }
 
+// Function to save tasks to Firestore
 function saveTasks(userId) {
     const tasks = {
         todo: [],
@@ -125,6 +134,7 @@ function saveTasks(userId) {
         });
 }
 
+// Function to load tasks from Firestore
 function loadTasks(userId) {
     db.collection('tasks').doc(userId).get()
         .then(doc => {
@@ -152,6 +162,7 @@ function loadTasks(userId) {
         });
 }
 
+// Function to create task elements in the UI
 function createTaskElement(task, columnId, isDone = false) {
     const column = document.getElementById(columnId);
     const newTask = document.createElement('div');
@@ -177,31 +188,37 @@ function createTaskElement(task, columnId, isDone = false) {
 
     const doneButton = document.createElement('button');
     doneButton.textContent = '✓';
+    doneButton.className = 'done-button'; // Add a class for styling
     doneButton.onclick = () => markAsDone(doneButton);
-
-    const onHoldButton = document.createElement('button');
-    onHoldButton.textContent = 'On-Hold';
-    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'x';
     deleteButton.className = 'delete-button';
     deleteButton.onclick = () => deleteTask(deleteButton);
 
+    const onHoldButton = document.createElement('button');
+    onHoldButton.textContent = 'On-Hold';
+    onHoldButton.className = 'onhold-button'; // Add a class for styling
+    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+
+    // Append buttons in the desired order
     newTask.appendChild(taskInput);
     newTask.appendChild(timeButtons);
-    if (!isDone) newTask.appendChild(doneButton);
     newTask.appendChild(onHoldButton);
     newTask.appendChild(deleteButton);
+    newTask.appendChild(doneButton);
+
     column.appendChild(newTask);
 
     addDragAndDrop(newTask);
 }
 
+// Event listeners for adding tasks and stopping the timer
 document.getElementById('add-task-button').addEventListener('click', addTask);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
 
+// Function to get a random motivational quote
 function getRandomQuote() {
     const quotes = [
         "When you think you're done, you're only at 40% of your body's capability. - David Goggins",
@@ -241,6 +258,7 @@ function getRandomQuote() {
     return quotes[randomIndex];
 }
 
+// Function to start the timer for a task
 function startTimer(minutes, button) {
     clearInterval(timer);
 
@@ -281,6 +299,7 @@ function startTimer(minutes, button) {
     });
 }
 
+// Function to stop the timer
 function stopTimer() {
     clearInterval(timer);
     document.getElementById('timer').textContent = '00:00';
@@ -296,6 +315,7 @@ function stopTimer() {
     }
 }
 
+// Function to mark a task as done
 function markAsDone(button) {
     stopTimer();
     const task = button.parentElement;
@@ -307,6 +327,7 @@ function markAsDone(button) {
     saveTasks(firebase.auth().currentUser.uid);
 }
 
+// Function to mark a task as on-hold
 function markAsOnHold(button) {
     stopTimer();
     const task = button.parentElement;
@@ -315,6 +336,7 @@ function markAsOnHold(button) {
     saveTasks(firebase.auth().currentUser.uid);
 }
 
+// Function to delete a task
 function deleteTask(button) {
     const task = button.parentElement;
     task.remove();
@@ -322,6 +344,7 @@ function deleteTask(button) {
     saveTasks(firebase.auth().currentUser.uid);
 }
 
+// Function to add a new task
 function addTask() {
     const todoColumn = document.getElementById('todo-column');
     const newTask = document.createElement('div');
@@ -347,22 +370,26 @@ function addTask() {
 
     const doneButton = document.createElement('button');
     doneButton.textContent = '✓';
+    doneButton.className = 'done-button'; // Add a class for styling
     doneButton.onclick = () => markAsDone(doneButton);
-
-    const onHoldButton = document.createElement('button');
-    onHoldButton.textContent = 'On-Hold';
-    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'x';
     deleteButton.className = 'delete-button';
     deleteButton.onclick = () => deleteTask(deleteButton);
 
+    const onHoldButton = document.createElement('button');
+    onHoldButton.textContent = 'On-Hold';
+    onHoldButton.className = 'onhold-button'; // Add a class for styling
+    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+
+    // Append buttons in the desired order
     newTask.appendChild(taskInput);
     newTask.appendChild(timeButtons);
-    newTask.appendChild(doneButton);
     newTask.appendChild(onHoldButton);
     newTask.appendChild(deleteButton);
+    newTask.appendChild(doneButton);
+
     todoColumn.appendChild(newTask);
 
     addDragAndDrop(newTask);
@@ -370,6 +397,7 @@ function addTask() {
     saveTasks(firebase.auth().currentUser.uid);
 }
 
+// Function to add drag-and-drop functionality to tasks
 function addDragAndDrop(task) {
     task.addEventListener('dragstart', dragStart);
     task.addEventListener('dragend', dragEnd);
@@ -386,6 +414,7 @@ document.querySelectorAll('.column').forEach(column => {
     column.addEventListener('drop', drop);
 });
 
+// Functions for drag-and-drop
 function dragStart(e) {
     e.dataTransfer.setData('text/plain', e.target.id);
     setTimeout(() => {
@@ -429,12 +458,14 @@ function dragEnd(e) {
     });
 }
 
+// Function to update task counts
 function updateCounts() {
     document.getElementById('tasks-count').textContent = document.getElementById('todo-column').querySelectorAll('.todo-item').length;
     document.getElementById('onhold-count').textContent = document.getElementById('onhold-column').querySelectorAll('.todo-item').length;
     document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
 }
 
+// Event listener for DOM content loaded
 document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
@@ -448,6 +479,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Function to show motivational quote modal
 function showQuoteModal() {
     const modal = document.getElementById('quote-modal');
     const quoteElement = document.getElementById('motivational-quote');
@@ -455,6 +487,7 @@ function showQuoteModal() {
     modal.classList.add('show');
 }
 
+// Function to close motivational quote modal
 function closeQuoteModal() {
     const modal = document.getElementById('quote-modal');
     modal.classList.remove('show');

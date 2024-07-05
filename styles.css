@@ -2,7 +2,8 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: #f4f4f9;
+    /* Change the background to a dark blue gradient */
+    background: linear-gradient(135deg, #000428 0%, #004e92 100%);
     margin: 0;
     padding: 0;
 }
@@ -11,6 +12,14 @@ header {
     text-align: center;
     margin: 20px;
     position: relative;
+    /* Change header text color to white */
+    color: white;
+}
+
+header #header-title {
+    font-size: 48px; /* Adjust the size as needed */
+    font-weight: 900; /* Poppins Black font weight */
+    margin: 0; /* Optional: Add if there is unnecessary margin */
 }
 
 #timer-container {
@@ -22,7 +31,7 @@ header {
 #timer {
     font-size: 48px;
     margin-top: 10px;
-    color: #333;
+    color: #fff;
 }
 
 #stop-timer-button {
@@ -120,13 +129,16 @@ h2 {
     border: none;
     background: none;
     width: 40%;
-    font-size: 16px;
+    font-color: #454545
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
 }
 
 .time-buttons button {
+    font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
     margin: 0 5px;
-    background-color: #5bc0de;
-    color: white;
+    background-color: #e6e6e6; /* Deep purple color */
+    color: #6e6e6e;
     border: none;
     padding: 5px 10px;
     border-radius: 5px;
@@ -134,7 +146,8 @@ h2 {
 }
 
 .time-buttons button:hover {
-    background-color: #31b0d5;
+    background-color: #3a006a; /* A slightly darker shade for hover effect */
+    color: white;
 }
 
 .delete-button {
@@ -148,6 +161,36 @@ h2 {
 
 .delete-button:hover {
     background-color: #c9302c;
+}
+
+.done-button {
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 5px; /* Add margin to the left for spacing */
+}
+
+.done-button:hover {
+    background-color: #4cae4c;
+}
+
+.onhold-button {
+    font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
+    font-size: 12px;
+    border: 1px solid #bbbbbd; /* Border color set to #8f8f8f */
+    border-radius: 5px; /* Make the button round */
+    margin-right: 5px;
+    cursor: pointer;
+    background-color: #f2f2f2; /* Default background color */
+    color: #000; /* Default text color */
+}
+
+.onhold-button:hover {
+    background-color: #e0e0e0; /* Darker purple color */
+    color: #000; /* White text color */
 }
 
 .drag-over {
