@@ -1,25 +1,25 @@
 /* styles.css */
 
+/* Basic styles */
 body {
     font-family: 'Poppins', sans-serif;
-    /* Change the background to a dark blue gradient */
     background: linear-gradient(135deg, #000428 0%, #004e92 100%);
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
 }
 
 header {
     text-align: center;
     margin: 20px;
     position: relative;
-    /* Change header text color to white */
     color: white;
 }
 
 header #header-title {
-    font-size: 48px; /* Adjust the size as needed */
-    font-weight: 900; /* Poppins Black font weight */
-    margin: 0; /* Optional: Add if there is unnecessary margin */
+    font-size: 36px; /* Adjusted for responsiveness */
+    font-weight: 900;
+    margin: 0;
 }
 
 #timer-container {
@@ -29,7 +29,7 @@ header #header-title {
 }
 
 #timer {
-    font-size: 48px;
+    font-size: 36px;
     margin-top: 10px;
     color: #fff;
 }
@@ -64,18 +64,20 @@ header #header-title {
 
 .container {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    justify-content: center;
     padding: 20px;
 }
 
 .column {
-    width: 30%;
+    width: 90%;
+    margin: 10px auto;
     padding: 20px;
     border: 1px solid #ddd;
     border-radius: 10px;
     background-color: #fff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    min-height: 300px;
+    min-height: 200px;
     position: relative;
 }
 
@@ -101,17 +103,14 @@ h2 {
     font-size: 24px;
     width: 40px;
     height: 40px;
-    line-height: 40px; /* Ensures text is vertically centered */
-    text-align: center; /* Ensures text is horizontally centered */
-    vertical-align: middle; /* Ensures the button is vertically aligned */
+    line-height: 40px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 #add-task-button:hover {
     background-color: #0720de;
 }
-
-
-
 
 .todo-item, .done-item {
     display: flex;
@@ -132,16 +131,15 @@ h2 {
 .task-title {
     border: none;
     background: none;
-    width: 40%;
-    font-color: #454545
+    width: 70%;
     font-size: 14px;
-    font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
+    font-family: 'Poppins', sans-serif;
 }
 
 .time-buttons button {
-    font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
+    font-family: 'Poppins', sans-serif;
     margin: 0 3px;
-    background-color: #e6e6e6; /* Deep purple color */
+    background-color: #e6e6e6;
     color: #6e6e6e;
     border: none;
     padding: 5px 10px;
@@ -149,58 +147,21 @@ h2 {
     cursor: pointer;
 }
 
-
 .time-buttons button:hover {
-    background-color: #3a006a; /* A slightly darker shade for hover effect */
+    background-color: #3a006a;
     color: white;
 }
 
-
-/* styles.css */
-
-/* styles.css */
-
-/* Adjust the container holding the buttons */
 .time-buttons {
     display: flex;
-    justify-content: flex-start; /* Align buttons to the left */
-    gap: 0px; /* Adjust the gap between buttons */
-    margin-right: 0; /* Remove any right margin */
+    justify-content: flex-start;
+    gap: 0px;
+    margin-right: 0;
 }
 
 .time-buttons button:last-child {
-    margin-right: 5px; /* Adjust the padding value as needed */
+    margin-right: 5px;
 }
-
-/* Adjust the task item container */
-.todo-item, .done-item {
-    display: flex;
-    justify-content: flex-start; /* Align items to the left */
-    align-items: center;
-    padding: 7px;
-    margin: 5px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    cursor: grab;
-    background-color: #f9f9f9;
-}
-
-/* Adjusting the spacing of the buttons */
-.delete-button,
-.done-button,
-.onhold-button {
-    margin-left: 5px; /* Add spacing to the left */
-    margin-right: 0; /* Remove any right margin */
-}
-
-.task-title {
-    flex-grow: 1; /* Allow task title to take available space */
-    white-space: normal; /* Allow text to wrap */
-    overflow-wrap: break-word; /* Break long words */
-}
-
-
-
 
 .delete-button {
     background-color: #d9534f;
@@ -222,7 +183,7 @@ h2 {
     padding: 4px 8px;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 5px; /* Add margin to the left for spacing */
+    margin-left: 5px;
 }
 
 .done-button:hover {
@@ -230,29 +191,27 @@ h2 {
 }
 
 .onhold-button {
-    font-family: 'Poppins', sans-serif; /* Font family set to Poppins */
+    font-family: 'Poppins', sans-serif;
     font-size: 12px;
-    border: 1px solid #bbbbbd; /* Border color set to #8f8f8f */
-    border-radius: 5px; /* Make the button round */
+    border: 1px solid #bbbbbd;
+    border-radius: 5px;
     cursor: pointer;
-    background-color: #f2f2f2; /* Default background color */
-    color: #000; /* Default text color */
+    background-color: #f2f2f2;
+    color: #000;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .onhold-button:hover {
-    background-color: #e0e0e0; /* Darker purple color */
-    color: #000; /* White text color */
+    background-color: #e0e0e0;
+    color: #000;
 }
 
 .onhold-button::before {
-    content: '\270B'; /* Unicode for hand stop gesture */
+    content: '\270B';
     font-size: 15px;
 }
-
-
 
 .drag-over {
     border: 2px dashed #ccc;
@@ -266,7 +225,6 @@ h2 {
     filter: none !important;
 }
 
-/* Modal Styles */
 .quote-modal {
     position: fixed;
     top: 0;
@@ -297,10 +255,10 @@ h2 {
 }
 
 #motivational-quote {
-    font-family: 'Poppins', sans-serif; /* Ensures the font is Poppins */
+    font-family: 'Poppins', sans-serif;
     font-size: 24px;
     margin-bottom: 20px;
-    text-align: center; /* Center-aligns the quote text */
+    text-align: center;
 }
 
 #quote-button {
@@ -311,14 +269,13 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
-    font-family: 'Poppins', sans-serif; /* Ensures the font is Poppins */
+    font-family: 'Poppins', sans-serif;
 }
 
 #quote-button:hover {
     background-color: #0056b3;
 }
 
-/* Login/Register Button Styles */
 .login-button {
     position: absolute;
     top: 20px;
@@ -374,7 +331,6 @@ h2 {
     background-color: #0056b3;
 }
 
-/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -423,7 +379,6 @@ h2 {
     text-decoration: underline;
 }
 
-/* styles.css */
 #pause-timer-button, #start-timer-button {
     font-family: 'Poppins', sans-serif;
     font-size: 16px;
@@ -465,16 +420,15 @@ h2 {
     background-color: #4cae4c;
 }
 
-/* Add this to your styles.css */
 .working-on-light {
-    font-weight: 200; /* Light font-weight for Poppins */
+    font-weight: 200;
 }
 
 #button-container {
     display: flex;
     justify-content: center;
-    gap: 10px; /* Adjust gap as needed */
-    margin-top: 10px; /* Adjust margin as needed */
+    gap: 10px;
+    margin-top: 10px;
 }
 
 #button-container button {
@@ -514,40 +468,38 @@ h2 {
 
 .delete-button,
 .done-button {
-    margin: 0 2px; /* Adjust the spacing between buttons */
+    margin: 0 2px;
 }
 
 .onhold-button {
-    margin: 0 2px; /* Adjust the spacing between buttons */
+    margin: 0 2px;
 }
 
-/* Additional CSS to ensure the buttons are aligned properly */
 .todo-item, .done-item {
     display: flex;
-    justify-content: flex-start; /* Align buttons to the left */
+    justify-content: flex-start;
     align-items: center;
 }
 
 .time-buttons {
-    margin-right: auto; /* Pushes the time buttons to the left */
+    margin-right: auto;
 }
 
-
 .common-button {
-    width: 60px;  /* Set the desired width */
-    height: 40px; /* Set the desired height */
+    width: 60px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 5px;
     margin: 0 2px;
-    font-size: 14px;  /* Adjust font size if necessary */
+    font-size: 14px;
     font-family: 'Poppins', sans-serif;
     border-radius: 5px;
     cursor: pointer;
     border: none;
 }
-/* Task Input Modal Styles */
+
 .task-input-modal {
     position: fixed;
     top: 50%;
@@ -560,19 +512,18 @@ h2 {
     z-index: 1001;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     display: none;
-    width: 100%; /* Increase the width of the modal */
-    max-width: 400px; /* Set a maximum width */
+    width: 90%;
+    max-width: 400px;
 }
 
 .task-input-field {
-    width: 90%;
+    width: 100%;
     font-size: 20px;
     border: none;
     outline: none;
     font-family: 'Poppins', sans-serif;
 }
 
-/* Blur Effect */
 body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     filter: blur(5px);
     pointer-events: none;
@@ -580,7 +531,7 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
 
 .google-login-button {
     font-family: 'Poppins', sans-serif;
-    width: 100%; /* Ensure the button takes the full width of its container */
+    width: 100%;
     margin-top: 10px;
     background-color: #FB4817;
     color: white;
@@ -590,9 +541,8 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     cursor: pointer;
     font-size: 16px;
     display: block;
-    text-align: center; /* Center the text within the button */
+    text-align: center;
 }
-
 
 .google-login-button:hover {
     background-color: #357ae8;
@@ -602,8 +552,6 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     font-family: 'Poppins', sans-serif;
 }
 
-
-/* Specifically style the login form inputs */
 #login-form input[type="email"],
 #login-form input[type="password"] {
     font-family: 'Poppins', sans-serif;
@@ -612,11 +560,10 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 100%; /* Ensure the inputs take the full width of the container */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Style the login submit button */
 #login-submit {
     font-family: 'Poppins', sans-serif;
     font-size: 16px;
@@ -626,10 +573,28 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    width: 100%; /* Ensure the button takes the full width of the container */
+    width: 100%;
     margin-top: 10px;
 }
 
 #login-submit:hover {
     background-color: #0056b3;
+}
+
+@media (min-width: 600px) {
+    .container {
+        flex-direction: row;
+    }
+    
+    .column {
+        width: 30%;
+    }
+    
+    header #header-title {
+        font-size: 48px;
+    }
+    
+    #timer {
+        font-size: 48px;
+    }
 }
