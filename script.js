@@ -310,6 +310,27 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('start-timer-button').style.display = 'none';
 }
 
+function stopTimer() {
+    clearInterval(timer);
+    timerPaused = false;
+    document.getElementById('timer').textContent = '00:00';
+    document.getElementById('header-title').textContent = 'Task List';
+
+    document.querySelectorAll('.blurred').forEach(element => {
+        element.classList.remove('blurred');
+    });
+
+    if (currentTaskElement) {
+        currentTaskElement.classList.remove('current-task');
+        currentTaskElement = null;
+    }
+
+    document.getElementById('pause-timer-button').style.display = 'none';
+    document.getElementById('start-timer-button').style.display = 'none';
+    document.getElementById('stop-timer-button').style.display = 'none';
+}
+
+
 function pauseTimer() {
     clearInterval(timer);
     timerPaused = true;
