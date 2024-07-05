@@ -33,6 +33,8 @@ document.getElementById('done-timer-button').addEventListener('click', doneTimer
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 document.getElementById('pause-timer-button').addEventListener('click', pauseTimer); // Add this line
 
+
+
 // Function for Google Sign-In
 function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();

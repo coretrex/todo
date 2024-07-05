@@ -92,6 +92,7 @@ h2 {
 }
 
 #add-task-button {
+    display: block; /* Ensure the button is displayed */
     background-color: #5566e6;
     color: white;
     border: none;
@@ -109,6 +110,7 @@ h2 {
 #add-task-button:hover {
     background-color: #0720de;
 }
+
 
 .todo-item, .done-item {
     display: flex;
@@ -570,4 +572,60 @@ h2 {
 body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     filter: blur(5px);
     pointer-events: none;
+}
+
+.google-login-button {
+    font-family: 'Poppins', sans-serif;
+    width: 100%; /* Ensure the button takes the full width of its container */
+    margin-top: 10px;
+    background-color: #FB4817;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    display: block;
+    text-align: center; /* Center the text within the button */
+}
+
+
+.google-login-button:hover {
+    background-color: #357ae8;
+}
+
+#login-form {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+/* Specifically style the login form inputs */
+#login-form input[type="email"],
+#login-form input[type="password"] {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%; /* Ensure the inputs take the full width of the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* Style the login submit button */
+#login-submit {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%; /* Ensure the button takes the full width of the container */
+    margin-top: 10px;
+}
+
+#login-submit:hover {
+    background-color: #0056b3;
 }
