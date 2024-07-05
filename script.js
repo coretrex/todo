@@ -241,7 +241,6 @@ function createTaskElement(task, columnId, isDone = false) {
     addDragAndDrop(newTask);
 }
 
-
 // Function to add a new task
 function addTask(taskTitle) {
     const todoColumn = document.getElementById('todo-column');
@@ -550,7 +549,6 @@ function dragEnd(e) {
     });
 }
 
-
 function updateCounts() {
     document.getElementById('tasks-count').textContent = document.getElementById('todo-column').querySelectorAll('.todo-item').length;
     document.getElementById('onhold-count').textContent = document.getElementById('onhold-column').querySelectorAll('.todo-item').length;
@@ -569,7 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showQuoteModal();
     });
 });
-
 
 function showQuoteModal() {
     const modal = document.getElementById('quote-modal');
