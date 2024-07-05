@@ -92,24 +92,25 @@ h2 {
 }
 
 #add-task-button {
-    display: block; /* Ensure the button is displayed */
+    display: inline-block;
     background-color: #5566e6;
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 24px;
     width: 40px;
     height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    line-height: 40px; /* Ensures text is vertically centered */
+    text-align: center; /* Ensures text is horizontally centered */
+    vertical-align: middle; /* Ensures the button is vertically aligned */
 }
 
 #add-task-button:hover {
     background-color: #0720de;
 }
+
+
 
 
 .todo-item, .done-item {
@@ -296,8 +297,10 @@ h2 {
 }
 
 #motivational-quote {
+    font-family: 'Poppins', sans-serif; /* Ensures the font is Poppins */
     font-size: 24px;
     margin-bottom: 20px;
+    text-align: center; /* Center-aligns the quote text */
 }
 
 #quote-button {
@@ -308,6 +311,7 @@ h2 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
+    font-family: 'Poppins', sans-serif; /* Ensures the font is Poppins */
 }
 
 #quote-button:hover {
