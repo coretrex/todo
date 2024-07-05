@@ -9,6 +9,40 @@ let endTime;
 // Initialize Firestore
 const db = firebase.firestore();
 
+// List of motivational quotes
+const quotes = [
+    "Believe you can and you're halfway there.",
+    "The only way to do great work is to love what you do.",
+    "Success is not how high you have climbed, but how you make a positive difference to the world.",
+    "Your limitation—it's only your imagination.",
+    "Push yourself, because no one else is going to do it for you.",
+    "Great things never come from comfort zones.",
+    "Dream it. Wish it. Do it.",
+    "Success doesn’t just find you. You have to go out and get it.",
+    "The harder you work for something, the greater you’ll feel when you achieve it."
+];
+
+// Function to get a random quote
+function getRandomQuote() {
+    return quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+// Function to show the quote modal
+function showQuoteModal() {
+    const modal = document.getElementById('quote-modal');
+    const quoteElement = document.getElementById('motivational-quote');
+    quoteElement.textContent = getRandomQuote();
+    modal.classList.add('show');
+}
+
+// Function to close the quote modal
+function closeQuoteModal() {
+    const modal = document.getElementById('quote-modal');
+    modal.classList.remove('show');
+}
+
+document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
+
 // Event listeners for login modal
 document.getElementById('login-button').addEventListener('click', () => {
     document.getElementById('login-modal').style.display = 'block';
@@ -31,9 +65,7 @@ document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
 document.getElementById('logout-button').addEventListener('click', logOut);
 document.getElementById('done-timer-button').addEventListener('click', doneTimer);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
-document.getElementById('pause-timer-button').addEventListener('click', pauseTimer); // Add this line
-
-
+document.getElementById('pause-timer-button').addEventListener('click', pauseTimer);
 
 // Function for Google Sign-In
 function signInWithGoogle() {
@@ -88,12 +120,23 @@ function signIn() {
 
 // Function to update user icon after login
 function updateUserIcon(email) {
+    console.log("updateUserIcon called with email:", email);
     const loginButton = document.getElementById('login-button');
     const userMenu = document.getElementById('user-menu');
     const userIcon = document.getElementById('user-icon');
+    const addTaskButton = document.getElementById('add-task-button');
+
     loginButton.style.display = 'none';
     userIcon.textContent = email.charAt(0).toUpperCase();
     userMenu.style.display = 'flex';
+
+    // Ensure the add task button is displayed
+    if (addTaskButton) {
+        console.log("Displaying Add Task button");
+        addTaskButton.style.display = 'block';
+    } else {
+        console.error("Add Task button not found");
+    }
 }
 
 // Function to toggle user menu
@@ -565,54 +608,29 @@ function updateCounts() {
 
 document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
+        const addTaskButton = document.getElementById('add-task-button');
+        console.log("Auth state changed. User:", user);
+
         if (user) {
             updateUserIcon(user.email);
             loadTasks(user.uid);
+            
+            // Ensure the add task button is displayed
+            if (addTaskButton) {
+                console.log("Displaying Add Task button after auth state change");
+                addTaskButton.style.display = 'block';
+            } else {
+                console.error("Add Task button not found");
+            }
         } else {
             clearTasks();
+            // Hide the add task button if no user is logged in
+            if (addTaskButton) {
+                console.log("Hiding Add Task button as no user is logged in");
+                addTaskButton.style.display = 'none';
+            }
         }
         updateCounts();
         showQuoteModal();
     });
-});
-
-function showQuoteModal() {
-    const modal = document.getElementById('quote-modal');
-    const quoteElement = document.getElementById('motivational-quote');
-    quoteElement.textContent = getRandomQuote();
-    modal.classList.add('show');
-}
-
-function closeQuoteModal() {
-    const modal = document.getElementById('quote-modal');
-    modal.classList.remove('show');
-}
-
-// Show the task input modal
-function showTaskInputModal() {
-    document.getElementById('task-input-modal').style.display = 'block';
-    document.body.classList.add('blur-effect-enabled');
-    document.getElementById('task-input-field').focus();
-}
-
-// Hide the task input modal
-function hideTaskInputModal() {
-    document.getElementById('task-input-modal').style.display = 'none';
-    document.body.classList.remove('blur-effect-enabled');
-}
-
-// Add event listener to show the task input modal when the add task button is clicked
-document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
-
-// Add event listener to handle task input
-document.getElementById('task-input-field').addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') {
-        const taskTitle = event.target.value;
-        if (taskTitle.trim() !== '') {
-            createTaskElement({ id: 'task-' + new Date().getTime(), title: taskTitle }, 'todo-column');
-            event.target.value = ''; // Clear the input field
-            hideTaskInputModal();
-            saveTasks(firebase.auth().currentUser.uid);
-        }
-    }
 });
