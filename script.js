@@ -26,10 +26,27 @@ document.getElementById('show-register').addEventListener('click', () => {
 // Event listeners for login and registration
 document.getElementById('login-submit').addEventListener('click', signIn);
 document.getElementById('register-submit').addEventListener('click', signUp);
+document.getElementById('google-login').addEventListener('click', signInWithGoogle);
 document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
 document.getElementById('logout-button').addEventListener('click', logOut);
 document.getElementById('done-timer-button').addEventListener('click', doneTimer);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
+
+// Function for Google Sign-In
+function signInWithGoogle() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then(result => {
+            console.log('Google Sign-In successful');
+            document.getElementById('login-modal').style.display = 'none';
+            updateUserIcon(result.user.email);
+            loadTasks(result.user.uid);
+        })
+        .catch(error => {
+            console.error('Error during Google Sign-In:', error.message);
+            alert(error.message);
+        });
+}
 
 // Function for user registration
 function signUp() {
