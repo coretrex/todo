@@ -1,11 +1,3 @@
-// script.js
-
-let timer;
-let currentTaskElement;
-let timerPaused = false;
-let remainingTime = 0;
-let endTime;
-
 // Initialize Firestore
 const db = firebase.firestore();
 
