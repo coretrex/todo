@@ -373,7 +373,15 @@ function markAsDone(button) {
     document.getElementById('done-column').appendChild(task);
     updateCounts();
     saveTasks(firebase.auth().currentUser.uid);
+    
+    // Trigger confetti effect
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+    });
 }
+
 
 // Function to mark a task as on-hold
 function markAsOnHold(button) {
