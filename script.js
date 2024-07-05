@@ -11,15 +11,16 @@ const db = firebase.firestore();
 
 // List of motivational quotes
 const quotes = [
-    "Believe you can and you're halfway there.",
-    "The only way to do great work is to love what you do.",
-    "Success is not how high you have climbed, but how you make a positive difference to the world.",
-    "Your limitation—it's only your imagination.",
-    "Push yourself, because no one else is going to do it for you.",
+    "The way to get started is to quit talking and begin doing.",
+    "The future depends on what you do today.",
+    "Don’t fear failure. Fear being in the exact same place next year as you are today.",
+    "If you want to be successful, you have to do what others are not willing to do.",
+    "The only way to grow is to push yourself beyond what you think you can do.",
     "Great things never come from comfort zones.",
-    "Dream it. Wish it. Do it.",
-    "Success doesn’t just find you. You have to go out and get it.",
-    "The harder you work for something, the greater you’ll feel when you achieve it."
+    "Don't stop when you're tired. Stop when you're done.",
+    "Discipline is the shortcut. If you want to make it big, you have to stay disciplined every single day.",
+    "Success isn’t owned, it’s leased. And rent is due every day."
+    "Work so hard that one day your signature will be called an autograph."
 ];
 
 // Function to get a random quote
