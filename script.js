@@ -71,7 +71,7 @@ function signInWithGoogle() {
         .then(result => {
             console.log('Google Sign-In successful');
             document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(result.user);
+            updateUserIcon(result.user.email);
             loadTasks(result.user.uid);
         })
         .catch(error => {
@@ -109,7 +109,7 @@ function signIn() {
         .then(userCredential => {
             console.log('Login successful');
             document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(userCredential.user);
+            updateUserIcon(email);
             loadTasks(userCredential.user.uid);
         })
         .catch(error => {
@@ -118,24 +118,20 @@ function signIn() {
         });
 }
 
-// Function to update user icon and header title after login
-function updateUserIcon(user) {
+// Function to update user icon after login
+function updateUserIcon(email) {
     const loginButton = document.getElementById('login-button');
     const userMenu = document.getElementById('user-menu');
     const userIcon = document.getElementById('user-icon');
     const addTaskButton = document.getElementById('add-task-button');
 
     loginButton.style.display = 'none';
-    userIcon.textContent = user.email.charAt(0).toUpperCase();
+    userIcon.textContent = email.charAt(0).toUpperCase();
     userMenu.style.display = 'flex';
-
-    // Get user's first name and update header title
-    const firstName = user.displayName ? user.displayName.split(' ')[0] : '';
-    document.getElementById('header-title').textContent = `${firstName}'s Task List`;
 
     // Ensure the add task button is always visible
     if (addTaskButton) {
-        addTaskButton.style.display = 'block';
+        addTaskButton.style.display = 'block';  // Ensuring it is visible
     }
 }
 
@@ -622,7 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             console.log('User is signed in:', user.email);
             document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(user);
+            updateUserIcon(user.email);
             clearTasks();  // Ensure tasks are cleared before loading
             loadTasks(user.uid);
         } else {
@@ -644,18 +640,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
 
-function updateUserIcon(user) {
+function updateUserIcon(email) {
     const loginButton = document.getElementById('login-button');
     const userMenu = document.getElementById('user-menu');
     const userIcon = document.getElementById('user-icon');
 
     loginButton.style.display = 'none';
-    userIcon.textContent = user.email.charAt(0).toUpperCase();
+    userIcon.textContent = email.charAt(0).toUpperCase();
     userMenu.style.display = 'flex';
-
-    // Get user's first name and update header title
-    const firstName = user.displayName ? user.displayName.split(' ')[0] : '';
-    document.getElementById('header-title').textContent = `${firstName}'s Task List`;
 }
 
 function logOut() {
@@ -832,28 +824,3 @@ function updateCounts() {
     document.getElementById('onhold-count').textContent = document.getElementById('onhold-column').querySelectorAll('.todo-item').length;
     document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            console.log('User is signed in:', user.email);
-            document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(user);
-            clearTasks();  // Ensure tasks are cleared before loading
-            loadTasks(user.uid);
-        } else {
-            console.log('No user is signed in');
-            clearTasks();
-            document.getElementById('login-modal').classList.add('show');
-        }
-
-        // Ensure the "Add Task" button is always visible
-        const addTaskButton = document.getElementById('add-task-button');
-        if (addTaskButton) {
-            addTaskButton.style.display = 'block';
-        }
-
-        updateCounts();
-        showQuoteModal();
-    });
-});
