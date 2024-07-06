@@ -69,11 +69,13 @@ function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
         .then(result => {
+            console.log('Google Sign-In successful');
             document.getElementById('login-modal').classList.remove('show');
             updateUserIcon(result.user.email);
             loadTasks(result.user.uid);
         })
         .catch(error => {
+            console.error('Error during Google Sign-In:', error.message);
             alert(error.message);
         });
 }
@@ -85,11 +87,13 @@ function signUp() {
     if (email && password) {
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then(userCredential => {
+                console.log('Registration successful');
                 document.getElementById('register-form').style.display = 'none';
                 document.getElementById('login-form').style.display = 'block';
                 document.getElementById('login-modal').classList.remove('show');
             })
             .catch(error => {
+                console.error('Error during registration:', error.message);
                 alert(error.message);
             });
     } else {
@@ -103,11 +107,13 @@ function signIn() {
     const password = document.getElementById('login-password').value;
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then(userCredential => {
+            console.log('Login successful');
             document.getElementById('login-modal').classList.remove('show');
             updateUserIcon(email);
             loadTasks(userCredential.user.uid);
         })
         .catch(error => {
+            console.error('Error during login:', error.message);
             alert(error.message);
         });
 }
@@ -197,6 +203,7 @@ function loadTasks(userId) {
         .then(doc => {
             if (doc.exists) {
                 const tasks = doc.data();
+                console.log('Loaded tasks:', tasks);
 
                 tasks.todo.forEach(task => {
                     createTaskElement(task, 'todo-column');
@@ -209,6 +216,8 @@ function loadTasks(userId) {
                 tasks.done.forEach(task => {
                     createTaskElement(task, 'done-column', true);
                 });
+            } else {
+                console.log("No tasks found!");
             }
         })
         .catch(error => {
@@ -353,6 +362,14 @@ document.getElementById('task-input-field').addEventListener('keydown', function
     }
 });
 
+// Add event listener for clicks outside the task input modal to close it
+document.addEventListener('click', function(event) {
+    const taskInputModal = document.getElementById('task-input-modal');
+    if (taskInputModal.style.display === 'block' && !taskInputModal.contains(event.target) && event.target.id !== 'add-task-button') {
+        hideTaskInputModal();
+    }
+});
+
 // Ensure the event listener for the "Stop Timer" button is correctly set
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 
@@ -463,17 +480,20 @@ function markAsDone(button) {
     task.classList.add('done-item');
     task.draggable = false;
 
+    // Hide the "On-Hold" button
     const onHoldButton = task.querySelector('.onhold-button');
     if (onHoldButton) {
         onHoldButton.style.display = 'none';
     }
 
+    // Remove the "Done" button
     button.remove();
 
     document.getElementById('done-column').appendChild(task);
     updateCounts();
     saveTasks(firebase.auth().currentUser.uid);
     
+    // Trigger confetti effect
     confetti({
         particleCount: 100,
         spread: 70,
@@ -485,11 +505,13 @@ function markAsOnHold(button) {
     stopTimer();
     const task = button.parentElement;
 
+    // Hide the "On-Hold" button
     const onHoldButton = task.querySelector('.onhold-button');
     if (onHoldButton) {
         onHoldButton.style.display = 'none';
     }
 
+    // Ensure the "Done" button is displayed
     const doneButton = task.querySelector('.done-button');
     if (doneButton) {
         doneButton.style.display = 'inline-block';
@@ -586,20 +608,15 @@ function updateCounts() {
 
 document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
-        const addTaskButton = document.getElementById('add-task-button');
         if (user) {
+            console.log('User is signed in:', user.email);
             document.getElementById('login-modal').classList.remove('show');
             updateUserIcon(user.email);
             loadTasks(user.uid);
-            if (addTaskButton) {
-                addTaskButton.style.display = 'block';
-            }
         } else {
+            console.log('No user is signed in');
             clearTasks();
             document.getElementById('login-modal').classList.add('show');
-            if (addTaskButton) {
-                addTaskButton.style.display = 'none';
-            }
         }
         updateCounts();
         showQuoteModal();
