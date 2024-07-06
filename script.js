@@ -129,8 +129,9 @@ function updateUserIcon(email) {
     userIcon.textContent = email.charAt(0).toUpperCase();
     userMenu.style.display = 'flex';
 
+    // Ensure the add task button is always visible
     if (addTaskButton) {
-        addTaskButton.style.display = 'block';
+        addTaskButton.style.display = 'block';  // Ensuring it is visible
     }
 }
 
@@ -147,6 +148,12 @@ function logOut() {
         document.getElementById('login-button').style.display = 'block';
         document.getElementById('login-modal').classList.add('show');
         clearTasks();
+
+        // Ensure the add task button is always visible after logout
+        const addTaskButton = document.getElementById('add-task-button');
+        if (addTaskButton) {
+            addTaskButton.style.display = 'block';
+        }
     }).catch(error => {
         alert(error.message);
     });
@@ -281,7 +288,6 @@ function createTaskElement(task, columnId, isDone = false) {
 
     addDragAndDrop(newTask);
 }
-
 
 // Function to add a new task
 function addTask(taskTitle) {
@@ -607,19 +613,25 @@ function updateCounts() {
     document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    firebase.auth().onAuthStateChanged(user => {
-        if (user) {
-            console.log('User is signed in:', user.email);
-            document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(user.email);
-            loadTasks(user.uid);
-        } else {
-            console.log('No user is signed in');
-            clearTasks();
-            document.getElementById('login-modal').classList.add('show');
-        }
-        updateCounts();
-        showQuoteModal();
-    });
-});
+//document.addEventListener('DOMContentLoaded', () => {
+  //  firebase.auth().onAuthStateChanged(user => {
+  //      if (user) {
+   //         console.log('User is signed in:', user.email);
+    //        document.getElementById('login-modal').classList.remove('show');
+   //         updateUserIcon(user.email);
+  //          loadTasks(user.uid);
+ //       } else {
+   //         console.log('No user is signed in');
+     //       clearTasks();
+    //        document.getElementById('login-modal').classList.add('show');
+     //   }
+
+      //  const addTaskButton = document.getElementById('add-task-button');
+      //  if (addTaskButton) {
+     //       addTaskButton.style.display = 'block';
+      //  }
+
+   //     updateCounts();
+  //      showQuoteModal();
+//    });
+//});
