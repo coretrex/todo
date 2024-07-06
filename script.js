@@ -613,25 +613,214 @@ function updateCounts() {
     document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
 }
 
-//document.addEventListener('DOMContentLoaded', () => {
-  //  firebase.auth().onAuthStateChanged(user => {
-  //      if (user) {
-   //         console.log('User is signed in:', user.email);
-    //        document.getElementById('login-modal').classList.remove('show');
-   //         updateUserIcon(user.email);
-  //          loadTasks(user.uid);
- //       } else {
-   //         console.log('No user is signed in');
-     //       clearTasks();
-    //        document.getElementById('login-modal').classList.add('show');
-     //   }
+document.addEventListener('DOMContentLoaded', () => {
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            console.log('User is signed in:', user.email);
+            document.getElementById('login-modal').classList.remove('show');
+            updateUserIcon(user.email);
+            clearTasks();  // Ensure tasks are cleared before loading
+            loadTasks(user.uid);
+        } else {
+            console.log('No user is signed in');
+            clearTasks();
+            document.getElementById('login-modal').classList.add('show');
+        }
 
-      //  const addTaskButton = document.getElementById('add-task-button');
-      //  if (addTaskButton) {
-     //       addTaskButton.style.display = 'block';
-      //  }
+        // Ensure the "Add Task" button is always visible
+        const addTaskButton = document.getElementById('add-task-button');
+        if (addTaskButton) {
+            addTaskButton.style.display = 'block';
+        }
 
-   //     updateCounts();
-  //      showQuoteModal();
-//    });
-//});
+        updateCounts();
+        showQuoteModal();
+    });
+});
+
+document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+
+function updateUserIcon(email) {
+    const loginButton = document.getElementById('login-button');
+    const userMenu = document.getElementById('user-menu');
+    const userIcon = document.getElementById('user-icon');
+
+    loginButton.style.display = 'none';
+    userIcon.textContent = email.charAt(0).toUpperCase();
+    userMenu.style.display = 'flex';
+}
+
+function logOut() {
+    firebase.auth().signOut().then(() => {
+        document.getElementById('user-menu').style.display = 'none';
+        document.getElementById('login-button').style.display = 'block';
+        document.getElementById('login-modal').classList.add('show');
+        clearTasks();
+    }).catch(error => {
+        alert(error.message);
+    });
+}
+
+function clearTasks() {
+    // Clear the tasks from the UI to prevent duplication
+    document.getElementById('todo-column').innerHTML = `
+        <div class="todo-header">
+            <h2>Tasks</h2>
+            <button id="add-task-button">+</button>
+        </div>`;
+    document.getElementById('onhold-column').innerHTML = '<h2>On-Hold</h2>';
+    document.getElementById('done-column').innerHTML = '<h2>Done</h2>';
+}
+
+function loadTasks(userId) {
+    db.collection('tasks').doc(userId).get().then(doc => {
+        if (doc.exists) {
+            const tasks = doc.data();
+            console.log('Loaded tasks:', tasks);
+
+            // Clear existing tasks to prevent duplication
+            clearTasks();
+
+            tasks.todo.forEach(task => {
+                createTaskElement(task, 'todo-column');
+            });
+
+            tasks.onhold.forEach(task => {
+                createTaskElement(task, 'onhold-column');
+            });
+
+            tasks.done.forEach(task => {
+                createTaskElement(task, 'done-column', true);
+            });
+
+            // Re-attach event listener for "Add Task" button after clearing tasks
+            document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+        } else {
+            console.log("No tasks found!");
+        }
+    }).catch(error => {
+        console.error('Error loading tasks:', error);
+    });
+}
+
+function createTaskElement(task, columnId, isDone = false) {
+    const column = document.getElementById(columnId);
+    const newTask = document.createElement('div');
+    newTask.className = isDone ? 'todo-item done-item' : 'todo-item';
+    newTask.draggable = true;
+    newTask.id = task.id;
+
+    const taskInput = document.createElement('input');
+    taskInput.type = 'text';
+    taskInput.value = task.title;
+    taskInput.className = 'task-title';
+    taskInput.addEventListener('input', () => saveTasks(firebase.auth().currentUser.uid));
+
+    const timeButtons = document.createElement('div');
+    timeButtons.className = 'time-buttons';
+
+    [15, 30, 60].forEach(time => {
+        const button = document.createElement('button');
+        button.textContent = `${time}m`;
+        button.onclick = () => startTimer(time, button);
+        timeButtons.appendChild(button);
+    });
+
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'x';
+    deleteButton.className = 'delete-button icon-button';
+    deleteButton.onclick = () => deleteTask(deleteButton);
+    deleteButton.innerHTML += '<span class="tooltip">Delete</span>';
+
+    const onHoldButton = document.createElement('button');
+    onHoldButton.className = 'onhold-button icon-button';
+    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+    onHoldButton.innerHTML += '<span class="tooltip">On-Hold</span>';
+
+    const doneButton = document.createElement('button');
+    doneButton.textContent = '✓';
+    doneButton.className = 'done-button icon-button';
+    doneButton.onclick = () => markAsDone(doneButton);
+    doneButton.innerHTML += '<span class="tooltip">Done</span>';
+
+    newTask.appendChild(taskInput);
+    newTask.appendChild(timeButtons);
+
+    if (!isDone && columnId !== 'onhold-column') {
+        newTask.appendChild(onHoldButton);
+        newTask.appendChild(doneButton);
+    } else if (columnId === 'onhold-column') {
+        newTask.appendChild(doneButton);
+    }
+
+    newTask.appendChild(deleteButton);
+    column.appendChild(newTask);
+
+    addDragAndDrop(newTask);
+}
+
+function addDragAndDrop(task) {
+    task.addEventListener('dragstart', dragStart);
+    task.addEventListener('dragend', dragEnd);
+}
+
+function dragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.id);
+    setTimeout(() => {
+        e.target.style.display = 'none';
+    }, 0);
+}
+
+function dragEnd(e) {
+    e.target.style.display = 'flex';
+    document.querySelectorAll('.drag-over').forEach(element => {
+        element.classList.remove('drag-over');
+    });
+}
+
+function dragOver(e) {
+    e.preventDefault();
+}
+
+function dragEnter(e) {
+    e.preventDefault();
+    if (e.target.classList.contains('column')) {
+        e.target.classList.add('drag-over');
+    }
+}
+
+function dragLeave(e) {
+    if (e.target.classList.contains('column')) {
+        e.target.classList.remove('drag-over');
+    }
+}
+
+function drop(e) {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const draggable = document.getElementById(id);
+    if (e.target.classList.contains('column')) {
+        e.target.appendChild(draggable);
+        const onHoldButton = draggable.querySelector('.onhold-button');
+        const doneButton = draggable.querySelector('.done-button');
+        if (e.target.id === 'done-column') {
+            if (onHoldButton) onHoldButton.style.display = 'none';
+            if (doneButton) doneButton.style.display = 'none';
+        } else if (e.target.id === 'onhold-column') {
+            if (onHoldButton) onHoldButton.style.display = 'none';
+            if (doneButton) doneButton.style.display = 'inline-block';
+        } else {
+            if (onHoldButton) onHoldButton.style.display = 'inline-block';
+            if (doneButton) doneButton.style.display = 'inline-block';
+        }
+    }
+    e.target.classList.remove('drag-over');
+    updateCounts();
+    saveTasks(firebase.auth().currentUser.uid);
+}
+
+function updateCounts() {
+    document.getElementById('tasks-count').textContent = document.getElementById('todo-column').querySelectorAll('.todo-item').length;
+    document.getElementById('onhold-count').textContent = document.getElementById('onhold-column').querySelectorAll('.todo-item').length;
+    document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
+}
