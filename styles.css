@@ -743,3 +743,43 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     max-width: 400px;
     margin: auto;
 }
+
+.icon-button {
+    position: relative;
+}
+
+.icon-button .tooltip {
+    font-family: 'Poppins', sans-serif;
+    visibility: hidden;
+    width: 80px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the icon */
+    left: 50%;
+    margin-left: -40px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.icon-button .tooltip::after {
+    content: '';
+    position: absolute;
+    font-family: 'Poppins', sans-serif;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+.icon-button:hover .tooltip {
+    visibility: visible;
+    font-family: 'Poppins', sans-serif;
+    opacity: 1;
+}

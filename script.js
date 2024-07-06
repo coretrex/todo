@@ -251,28 +251,28 @@ function createTaskElement(task, columnId, isDone = false) {
 
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'x';
-    deleteButton.className = 'delete-button';
+    deleteButton.className = 'delete-button icon-button';
     deleteButton.onclick = () => deleteTask(deleteButton);
+    deleteButton.innerHTML += '<span class="tooltip">Delete</span>';
+
+    const onHoldButton = document.createElement('button');
+    onHoldButton.className = 'onhold-button icon-button';
+    onHoldButton.onclick = () => markAsOnHold(onHoldButton);
+    onHoldButton.innerHTML += '<span class="tooltip">On-Hold</span>';
+
+    const doneButton = document.createElement('button');
+    doneButton.textContent = '✓';
+    doneButton.className = 'done-button icon-button';
+    doneButton.onclick = () => markAsDone(doneButton);
+    doneButton.innerHTML += '<span class="tooltip">Done</span>';
 
     newTask.appendChild(taskInput);
     newTask.appendChild(timeButtons);
 
     if (!isDone && columnId !== 'onhold-column') {
-        const onHoldButton = document.createElement('button');
-        onHoldButton.className = 'onhold-button';
-        onHoldButton.onclick = () => markAsOnHold(onHoldButton);
         newTask.appendChild(onHoldButton);
-
-        const doneButton = document.createElement('button');
-        doneButton.textContent = '✓';
-        doneButton.className = 'done-button';
-        doneButton.onclick = () => markAsDone(doneButton);
         newTask.appendChild(doneButton);
     } else if (columnId === 'onhold-column') {
-        const doneButton = document.createElement('button');
-        doneButton.textContent = '✓';
-        doneButton.className = 'done-button';
-        doneButton.onclick = () => markAsDone(doneButton);
         newTask.appendChild(doneButton);
     }
 
@@ -281,6 +281,7 @@ function createTaskElement(task, columnId, isDone = false) {
 
     addDragAndDrop(newTask);
 }
+
 
 // Function to add a new task
 function addTask(taskTitle) {
