@@ -64,6 +64,11 @@ document.getElementById('done-timer-button').addEventListener('click', doneTimer
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 document.getElementById('pause-timer-button').addEventListener('click', pauseTimer);
 
+// Add the event listener for the start-timer-button to resume the timer
+document.getElementById('start-timer-button').addEventListener('click', () => {
+    startTimer(0, null, true);
+});
+
 // Function for Google Sign-In
 function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
@@ -811,7 +816,7 @@ function drop(e) {
             if (doneButton) doneButton.style.display = 'inline-block';
         } else {
             if (onHoldButton) onHoldButton.style.display = 'inline-block';
-            if (doneButton) doneButton.style.display = 'inline-block';
+            if (doneButton) onHoldButton.style.display = 'inline-block';
         }
     }
     e.target.classList.remove('drag-over');
