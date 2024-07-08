@@ -350,23 +350,37 @@ function showTaskInputModal() {
     document.getElementById('task-input-modal').style.display = 'block';
     document.body.classList.add('blur-effect-enabled');
     document.getElementById('task-input-field').focus();
+    document.getElementById('task-input-field').setAttribute('data-column', 'todo-column');
+}
+
+// Show the task input modal for On-Hold column
+function showOnHoldTaskInputModal() {
+    document.getElementById('task-input-modal').style.display = 'block';
+    document.body.classList.add('blur-effect-enabled');
+    document.getElementById('task-input-field').focus();
+    document.getElementById('task-input-field').setAttribute('data-column', 'onhold-column');
 }
 
 // Hide the task input modal
 function hideTaskInputModal() {
     document.getElementById('task-input-modal').style.display = 'none';
     document.body.classList.remove('blur-effect-enabled');
+    document.getElementById('task-input-field').removeAttribute('data-column');
 }
 
 // Add event listener to show the task input modal when the add task button is clicked
 document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
 
+// Add event listener to show the task input modal when the add task button for On-Hold column is clicked
+document.getElementById('add-onhold-task-button').addEventListener('click', showOnHoldTaskInputModal);
+
 // Add event listener to handle task input
 document.getElementById('task-input-field').addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
         const taskTitle = event.target.value;
+        const columnId = event.target.getAttribute('data-column') || 'todo-column';
         if (taskTitle.trim() !== '') {
-            createTaskElement({ id: 'task-' + new Date().getTime(), title: taskTitle }, 'todo-column');
+            createTaskElement({ id: 'task-' + new Date().getTime(), title: taskTitle }, columnId);
             event.target.value = ''; // Clear the input field
             hideTaskInputModal();
             saveTasks(firebase.auth().currentUser.uid);
@@ -377,7 +391,7 @@ document.getElementById('task-input-field').addEventListener('keydown', function
 // Add event listener for clicks outside the task input modal to close it
 document.addEventListener('click', function(event) {
     const taskInputModal = document.getElementById('task-input-modal');
-    if (taskInputModal.style.display === 'block' && !taskInputModal.contains(event.target) && event.target.id !== 'add-task-button') {
+    if (taskInputModal.style.display === 'block' && !taskInputModal.contains(event.target) && event.target.id !== 'add-task-button' && event.target.id !== 'add-onhold-task-button') {
         hideTaskInputModal();
     }
 });
@@ -673,7 +687,11 @@ function clearTasks() {
             <h2>Tasks</h2>
             <button id="add-task-button">+</button>
         </div>`;
-    document.getElementById('onhold-column').innerHTML = '<h2>On-Hold</h2>';
+    document.getElementById('onhold-column').innerHTML = `
+        <div class="onhold-header">
+            <h2>On-Hold</h2>
+            <button id="add-onhold-task-button">+</button>
+        </div>`;
     document.getElementById('done-column').innerHTML = '<h2>Done</h2>';
 }
 
@@ -700,6 +718,7 @@ function loadTasks(userId) {
 
             // Re-attach event listener for "Add Task" button after clearing tasks
             document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+            document.getElementById('add-onhold-task-button').addEventListener('click', showOnHoldTaskInputModal);
         } else {
             console.log("No tasks found!");
         }
@@ -816,7 +835,7 @@ function drop(e) {
             if (doneButton) doneButton.style.display = 'inline-block';
         } else {
             if (onHoldButton) onHoldButton.style.display = 'inline-block';
-            if (doneButton) onHoldButton.style.display = 'inline-block';
+            if (doneButton) doneButton.style.display = 'inline-block';
         }
     }
     e.target.classList.remove('drag-over');

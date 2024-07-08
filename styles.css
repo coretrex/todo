@@ -476,6 +476,33 @@ h2 {
     margin: 0 2px;
 }
 
+.onhold-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#add-onhold-task-button {
+    display: inline-block;
+    background-color: #5566e6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#add-onhold-task-button:hover {
+    background-color: #0720de;
+}
+
+
 .onhold-button {
     margin: 0 2px;
 }

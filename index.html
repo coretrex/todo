@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
     <script>
         // Firebase configuration and initialization
-         var firebaseConfig = {
+        var firebaseConfig = {
             apiKey: "AIzaSyC7nq_DFrbGn2xXa5rdZS5PCLFo9MZshfE",
             authDomain: "to-do-ef6b1.firebaseapp.com",
             projectId: "to-do-ef6b1",
@@ -53,12 +53,15 @@
 <div class="container">
     <div class="column" id="todo-column">
         <div class="todo-header">
-            <h2>Tasks</h2>
+            <h2>Active Tasks</h2>
             <button id="add-task-button">+</button>
         </div>
     </div>
     <div class="column" id="onhold-column">
-        <h2>On-Hold</h2>
+        <div class="onhold-header">
+            <h2>On-Hold</h2>
+            <button id="add-onhold-task-button">+</button>
+        </div>
     </div>
     <div class="column" id="done-column">
         <h2>Done</h2>
