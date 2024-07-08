@@ -11,7 +11,7 @@ const db = firebase.firestore();
 
 // List of motivational quotes
 const quotes = [
-    "The way to get started is to quit talking and begin doing.",
+    "The magic you are looking for is in the work you are avoiding",
     "The future depends on what you do today.",
     "Don’t fear failure. Fear being in the exact same place next year as you are today.",
     "If you want to be successful, you have to do what others are not willing to do.",
