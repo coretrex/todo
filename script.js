@@ -633,6 +633,11 @@ function updateCounts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Attach the event listener for the login button
+    document.getElementById('login-button').addEventListener('click', () => {
+        document.getElementById('login-modal').classList.add('show');
+    });
+
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             console.log('User is signed in:', user.email);
@@ -640,22 +645,21 @@ document.addEventListener('DOMContentLoaded', () => {
             updateUserIcon(user.email);
             clearTasks();  // Ensure tasks are cleared before loading
             loadTasks(user.uid);
+
+            // Re-attach event listeners for adding tasks
+            document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+            document.getElementById('add-onhold-task-button').addEventListener('click', showOnHoldTaskInputModal);
         } else {
             console.log('No user is signed in');
             clearTasks();
             document.getElementById('login-modal').classList.add('show');
         }
-
-        // Ensure the "Add Task" button is always visible
-        const addTaskButton = document.getElementById('add-task-button');
-        if (addTaskButton) {
-            addTaskButton.style.display = 'block';
-        }
-
         updateCounts();
         showQuoteModal();
     });
 });
+
+    
 
 document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
 
@@ -679,6 +683,7 @@ function logOut() {
         alert(error.message);
     });
 }
+
 
 function clearTasks() {
     // Clear the tasks from the UI to prevent duplication
