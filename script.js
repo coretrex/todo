@@ -19,7 +19,7 @@ const quotes = [
     "Great things never come from comfort zones.",
     "Don't stop when you're tired. Stop when you're done.",
     "Discipline is the shortcut. If you want to make it big, you have to stay disciplined every single day.",
-    "Success isn’t owned, it’s leased. And rent is due every day."
+    "Success isn't owned, it's leased. And rent is due every day."
 ];
 
 // Function to get a random quote
@@ -43,133 +43,13 @@ function closeQuoteModal() {
 
 document.getElementById('quote-button').addEventListener('click', closeQuoteModal);
 
-// Event listeners for login modal
-document.getElementById('login-button').addEventListener('click', () => {
-    document.getElementById('login-modal').classList.add('show');
-});
-
-// Event listeners for showing registration form
-document.getElementById('show-register').addEventListener('click', () => {
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('register-form').style.display = 'block';
-});
-
-// Event listeners for login and registration
-document.getElementById('login-submit').addEventListener('click', signIn);
-document.getElementById('register-submit').addEventListener('click', signUp);
-document.getElementById('google-login').addEventListener('click', signInWithGoogle);
-document.getElementById('user-icon').addEventListener('click', toggleUserMenu);
-document.getElementById('logout-button').addEventListener('click', logOut);
+// Event listeners for timer buttons
 document.getElementById('done-timer-button').addEventListener('click', doneTimer);
 document.getElementById('stop-timer-button').addEventListener('click', stopTimer);
 document.getElementById('pause-timer-button').addEventListener('click', pauseTimer);
-
-// Add the event listener for the start-timer-button to resume the timer
 document.getElementById('start-timer-button').addEventListener('click', () => {
     startTimer(0, null, true);
 });
-
-// Function for Google Sign-In
-function signInWithGoogle() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then(result => {
-            console.log('Google Sign-In successful');
-            document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(result.user.email);
-            loadTasks(result.user.uid);
-        })
-        .catch(error => {
-            console.error('Error during Google Sign-In:', error.message);
-            alert(error.message);
-        });
-}
-
-// Function for user registration
-function signUp() {
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    if (email && password) {
-        firebase.auth().createUserWithEmailAndPassword(email, password)
-            .then(userCredential => {
-                console.log('Registration successful');
-                document.getElementById('register-form').style.display = 'none';
-                document.getElementById('login-form').style.display = 'block';
-                document.getElementById('login-modal').classList.remove('show');
-            })
-            .catch(error => {
-                console.error('Error during registration:', error.message);
-                alert(error.message);
-            });
-    } else {
-        alert('Please enter both email and password.');
-    }
-}
-
-// Function for user login
-function signIn() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-            console.log('Login successful');
-            document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(email);
-            loadTasks(userCredential.user.uid);
-        })
-        .catch(error => {
-            console.error('Error during login:', error.message);
-            alert(error.message);
-        });
-}
-
-// Function to update user icon after login
-function updateUserIcon(email) {
-    const loginButton = document.getElementById('login-button');
-    const userMenu = document.getElementById('user-menu');
-    const userIcon = document.getElementById('user-icon');
-    const addTaskButton = document.getElementById('add-task-button');
-
-    loginButton.style.display = 'none';
-    userIcon.textContent = email.charAt(0).toUpperCase();
-    userMenu.style.display = 'flex';
-
-    // Ensure the add task button is always visible
-    if (addTaskButton) {
-        addTaskButton.style.display = 'block';  // Ensuring it is visible
-    }
-}
-
-// Function to toggle user menu
-function toggleUserMenu() {
-    const logoutButton = document.getElementById('logout-button');
-    logoutButton.style.display = logoutButton.style.display === 'block' ? 'none' : 'block';
-}
-
-// Function for user logout
-function logOut() {
-    firebase.auth().signOut().then(() => {
-        document.getElementById('user-menu').style.display = 'none';
-        document.getElementById('login-button').style.display = 'block';
-        document.getElementById('login-modal').classList.add('show');
-        clearTasks();
-
-        // Ensure the add task button is always visible after logout
-        const addTaskButton = document.getElementById('add-task-button');
-        if (addTaskButton) {
-            addTaskButton.style.display = 'block';
-        }
-    }).catch(error => {
-        alert(error.message);
-    });
-}
-
-// Function to clear tasks from the UI
-function clearTasks() {
-    document.getElementById('todo-column').innerHTML = '';
-    document.getElementById('onhold-column').innerHTML = '';
-    document.getElementById('done-column').innerHTML = '';
-}
 
 // Function to save tasks to Firestore
 function saveTasks(userId) {
@@ -216,6 +96,8 @@ function loadTasks(userId) {
             if (doc.exists) {
                 const tasks = doc.data();
                 console.log('Loaded tasks:', tasks);
+
+                clearTasks();
 
                 tasks.todo.forEach(task => {
                     createTaskElement(task, 'todo-column');
@@ -633,26 +515,16 @@ function updateCounts() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Attach the event listener for the login button
-    document.getElementById('login-button').addEventListener('click', () => {
-        document.getElementById('login-modal').classList.add('show');
-    });
-
     firebase.auth().onAuthStateChanged(user => {
         if (user) {
             console.log('User is signed in:', user.email);
-            document.getElementById('login-modal').classList.remove('show');
-            updateUserIcon(user.email);
-            clearTasks();  // Ensure tasks are cleared before loading
+            clearTasks();
             loadTasks(user.uid);
-
-            // Re-attach event listeners for adding tasks
             document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
             document.getElementById('add-onhold-task-button').addEventListener('click', showOnHoldTaskInputModal);
         } else {
             console.log('No user is signed in');
-            clearTasks();
-            document.getElementById('login-modal').classList.add('show');
+            window.location.href = 'login.html';
         }
         updateCounts();
         showQuoteModal();
@@ -662,28 +534,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
 
 document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
-
-function updateUserIcon(email) {
-    const loginButton = document.getElementById('login-button');
-    const userMenu = document.getElementById('user-menu');
-    const userIcon = document.getElementById('user-icon');
-
-    loginButton.style.display = 'none';
-    userIcon.textContent = email.charAt(0).toUpperCase();
-    userMenu.style.display = 'flex';
-}
-
-function logOut() {
-    firebase.auth().signOut().then(() => {
-        document.getElementById('user-menu').style.display = 'none';
-        document.getElementById('login-button').style.display = 'block';
-        document.getElementById('login-modal').classList.add('show');
-        clearTasks();
-    }).catch(error => {
-        alert(error.message);
-    });
-}
-
 
 function clearTasks() {
     // Clear the tasks from the UI to prevent duplication
@@ -853,3 +703,69 @@ function updateCounts() {
     document.getElementById('onhold-count').textContent = document.getElementById('onhold-column').querySelectorAll('.todo-item').length;
     document.getElementById('completed-count').textContent = document.getElementById('done-column').querySelectorAll('.done-item').length;
 }
+// ... existing code ...
+
+// Add these functions at the end of your script.js file
+
+function updateUserUI(user) {
+    const loginButton = document.getElementById('login-button');
+    const userMenu = document.getElementById('user-menu');
+    const userIcon = document.getElementById('user-icon');
+    const logoutButton = document.getElementById('logout-button');
+
+    if (user) {
+        // User is signed in
+        loginButton.style.display = 'none';
+        userMenu.style.display = 'flex';
+        userIcon.textContent = user.email.charAt(0).toUpperCase();
+        
+        // Toggle logout button visibility on user menu click
+        userMenu.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent this click from immediately hiding the logout button
+            logoutButton.style.display = logoutButton.style.display === 'block' ? 'none' : 'block';
+        });
+        
+        // Add click event for logout
+        logoutButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent this click from bubbling up to the userMenu
+            firebase.auth().signOut().then(() => {
+                console.log('User signed out');
+                window.location.href = 'login.html';
+            }).catch((error) => {
+                console.error('Sign out error', error);
+            });
+        });
+
+        // Hide logout button when clicking outside
+        document.addEventListener('click', () => {
+            logoutButton.style.display = 'none';
+        });
+    } else {
+        // No user is signed in
+        loginButton.style.display = 'block';
+        userMenu.style.display = 'none';
+    }
+}
+
+// The rest of your code remains the same
+
+// Modify the DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', () => {
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            console.log('User is signed in:', user.email);
+            clearTasks();
+            loadTasks(user.uid);
+            document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
+            document.getElementById('add-onhold-task-button').addEventListener('click', showOnHoldTaskInputModal);
+            updateUserUI(user);  // Add this line
+        } else {
+            console.log('No user is signed in');
+            window.location.href = 'login.html';
+        }
+        updateCounts();
+        showQuoteModal();
+    });
+});
+
+// ... rest of the existing code ...
