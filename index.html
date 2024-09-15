@@ -36,6 +36,7 @@
             <button id="pause-timer-button" style="display: none;">Pause Timer</button>
             <button id="start-timer-button" style="display: none;">Start Timer</button>
             <button id="done-timer-button" style="display: none;">Done</button>
+            <button id="goals-button">Goals</button>
         </div>
     </div>
     <div class="metrics">
@@ -83,6 +84,17 @@
 </div>
 <script src="script.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+
+<!-- Add this at the end of the body, just before the closing </body> tag -->
+<div id="goals-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>My Goals</h2>
+        <textarea id="goals-textarea" placeholder="Enter Goals Here" rows="10" cols="50"></textarea>
+        <button id="save-goals" class="outline-button">Save Goals</button>
+    </div>
+</div>
+
 
 </body>
 </html>

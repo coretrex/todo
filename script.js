@@ -747,8 +747,6 @@ function updateUserUI(user) {
     }
 }
 
-// The rest of your code remains the same
-
 // Modify the DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(user => {
@@ -768,4 +766,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// ... rest of the existing code ...
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle opening of the Goals modal
+    const goalsButton = document.getElementById('goals-button');
+    const goalsModal = document.getElementById('goals-modal');
+    const closeGoalsButton = document.querySelector('#goals-modal .close');
+    const saveGoalsButton = document.getElementById('save-goals');
+    const goalsTextarea = document.getElementById('goals-textarea');
+
+    // Check if the elements are present
+    if (goalsButton && goalsModal && closeGoalsButton && saveGoalsButton && goalsTextarea) {
+        // Function to open the goals modal
+        goalsButton.addEventListener('click', () => {
+            goalsModal.style.display = 'block';
+            const savedGoals = localStorage.getItem('goals');
+            if (savedGoals) {
+                goalsTextarea.value = savedGoals;
+            }
+        });
+
+        // Function to close the goals modal
+        closeGoalsButton.addEventListener('click', () => {
+            goalsModal.style.display = 'none';
+        });
+
+        // Function to save goals to localStorage and close modal
+        saveGoalsButton.addEventListener('click', () => {
+            const goalsText = goalsTextarea.value;
+            localStorage.setItem('goals', goalsText);
+            // alert('Goals saved!');
+            goalsModal.style.display = 'none';
+        });
+
+        // Close the modal if the user clicks outside the modal content
+        window.addEventListener('click', (event) => {
+            if (event.target === goalsModal) {
+                goalsModal.style.display = 'none';
+            }
+        });
+    } else {
+        console.error("One or more elements not found in the DOM.");
+    }
+});
+
+

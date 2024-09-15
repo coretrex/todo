@@ -810,3 +810,84 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     font-family: 'Poppins', sans-serif;
     opacity: 1;
 }
+/* Add these styles at the end of your styles.css file */
+
+/* Goals Modal Close Button */
+#goals-modal .modal-content {
+    display: flex;
+    flex-direction: column;  /* Ensures vertical stacking */
+    align-items: center;     /* Center align the items horizontally */
+    justify-content: center; /* Center them vertically if needed */
+    width: 80%;              /* Width can be adjusted as per design needs */
+    max-width: 600px;        /* Maximum width */
+    padding: 20px;
+    background-color: #fefefe;
+    margin: 15% auto;
+    border: 1px solid #888;
+    border-radius: 10px;     /* Rounded corners */
+    position: relative;
+}
+
+#goals-textarea {
+    width: 100%;            /* Makes textarea take full width of the modal */
+    height: 150px;          /* Adjust height to fit more content */
+    margin-bottom: 20px;    /* Space between textarea and button */
+    padding: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.outline-button {
+    width: auto;            /* Button width to fit content */
+    padding: 10px 20px;     /* Padding for better button size */
+    font-family: 'Poppins', sans-serif;
+    background-color: transparent;
+    border: 2px solid #4CAF50; /* Green border */
+    color: #4CAF50;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.outline-button:hover {
+    background-color: #4CAF50; /* Green background on hover */
+    color: white;              /* White text on hover */
+}
+
+.close {
+    display:none;
+}
+
+#module-creator {
+    margin: 20px;
+    text-align: center;
+}
+
+#new-module-name {
+    padding: 10px;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+#add-module {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+#button-container {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+}
+
+#button-container button {
+    margin: 0 10px; /* Space out buttons */
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#new-module-name {
+    margin-top: 10px; /* Space from the buttons */
+}
