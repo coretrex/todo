@@ -300,8 +300,10 @@ function startTimer(minutes, button, resume = false) {
     const taskTitleElement = currentTaskElement.querySelector('.task-title');
     const taskTitle = taskTitleElement.value;
 
-    // Apply the new class to the "Working on:" text
     document.getElementById('header-title').innerHTML = `<span class="working-on-light">Working on:</span> <strong>${taskTitle}</strong>`;
+
+    hideNoteButtons();  // Hide all note buttons when the timer starts
+    hideAddNoteButton();  // Hide the "Add Note" button when the timer starts
 
     timer = setInterval(() => {
         remainingTime = endTime - Date.now();
@@ -334,6 +336,8 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('start-timer-button').style.display = 'none';
 }
 
+
+
 // Function to stop the timer
 function stopTimer() {
     clearInterval(timer);
@@ -358,7 +362,27 @@ function stopTimer() {
     if (doneButton) {
         doneButton.style.display = 'none'; // Ensure Done button is hidden
     }
+
+    showNoteButtons();  // Show all note buttons when the timer stops
+    showAddNoteButton();  // Show the "Add Note" button when the timer stops
 }
+
+function pauseTimer() {
+    clearInterval(timer);
+    timerPaused = true;
+    remainingTime = endTime - Date.now(); // Calculate remaining time
+    document.querySelectorAll('.blurred').forEach(element => {
+        element.classList.remove('blurred');
+    });
+
+    document.getElementById('pause-timer-button').style.display = 'none';
+    document.getElementById('start-timer-button').style.display = 'inline-block';
+
+    showNoteButtons();  // Show all note buttons when the timer is paused
+    showAddNoteButton();  // Show the "Add Note" button when the timer is paused
+}
+
+
 
 // Function to pause the timer
 function pauseTimer() {
@@ -767,46 +791,173 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle opening of the Goals modal
-    const goalsButton = document.getElementById('goals-button');
-    const goalsModal = document.getElementById('goals-modal');
-    const closeGoalsButton = document.querySelector('#goals-modal .close');
-    const saveGoalsButton = document.getElementById('save-goals');
-    const goalsTextarea = document.getElementById('goals-textarea');
+    const addNoteButton = document.getElementById('add-note-button');
+    const buttonContainer = document.getElementById('button-container');
 
-    // Check if the elements are present
-    if (goalsButton && goalsModal && closeGoalsButton && saveGoalsButton && goalsTextarea) {
-        // Function to open the goals modal
-        goalsButton.addEventListener('click', () => {
-            goalsModal.style.display = 'block';
-            const savedGoals = localStorage.getItem('goals');
-            if (savedGoals) {
-                goalsTextarea.value = savedGoals;
-            }
-        });
-
-        // Function to close the goals modal
-        closeGoalsButton.addEventListener('click', () => {
-            goalsModal.style.display = 'none';
-        });
-
-        // Function to save goals to localStorage and close modal
-        saveGoalsButton.addEventListener('click', () => {
-            const goalsText = goalsTextarea.value;
-            localStorage.setItem('goals', goalsText);
-            // alert('Goals saved!');
-            goalsModal.style.display = 'none';
-        });
-
-        // Close the modal if the user clicks outside the modal content
-        window.addEventListener('click', (event) => {
-            if (event.target === goalsModal) {
-                goalsModal.style.display = 'none';
-            }
-        });
-    } else {
-        console.error("One or more elements not found in the DOM.");
+    // Function to create the new note button and modal
+    function createNoteButton(uniqueId) {
+        // Check if the button already exists to prevent duplicates
+        if (!document.querySelector(`[data-id="${uniqueId}"]`)) {
+            // Create the new note button
+            const newNoteButton = document.createElement('button');
+            newNoteButton.textContent = loadNoteTitle(uniqueId) || 'New Note'; // Load title or default to 'New Note'
+            newNoteButton.className = 'note-button';
+            newNoteButton.setAttribute('data-id', uniqueId); // Assign a unique ID to each button
+    
+            // Set default color to orange if no saved color is found
+            const savedColor = localStorage.getItem(`noteColor-${uniqueId}`) || '#FFA500'; // Default to orange (#FFA500)
+            newNoteButton.style.backgroundColor = savedColor;
+    
+            newNoteButton.addEventListener('click', () => openNoteModal(uniqueId)); // Pass the unique ID when opening the modal
+    
+            // Insert the new note button into the button container
+            const buttonContainer = document.getElementById('button-container');
+            const addNoteButton = document.getElementById('add-note-button');
+            buttonContainer.insertBefore(newNoteButton, addNoteButton);
+    
+            // Create a new modal for this note
+            createNoteModal(uniqueId);
+        }
     }
+    
+    
+
+    // Function to create a note modal
+    function createNoteModal(uniqueId) {
+        const noteModal = document.createElement('div');
+        noteModal.className = 'modal';
+        noteModal.id = `note-modal-${uniqueId}`;
+    
+        noteModal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-note" data-id="${uniqueId}">&times;</span>
+                <h2><input type="text" id="note-title-${uniqueId}" placeholder="Note Title" class="note-title-input"></h2>
+                <textarea id="note-textarea-${uniqueId}" placeholder="Enter your note here" rows="10" cols="50"></textarea>
+                <label for="note-color-${uniqueId}">Select Button Color:</label>
+                <input type="color" id="note-color-${uniqueId}" class="note-color-picker" value="#ffffff">
+                <button id="save-note-${uniqueId}" class="outline-button">Save Note</button>
+                <button id="delete-note-${uniqueId}" class="delete-note-btn">Delete Note</button>
+            </div>
+        `;
+        document.body.appendChild(noteModal);
+    
+        const savedTitle = loadNoteTitle(uniqueId);
+        const savedNote = localStorage.getItem(`noteContent-${uniqueId}`);
+        const savedColor = localStorage.getItem(`noteColor-${uniqueId}`) || '#ffffff';
+    
+        document.getElementById(`note-title-${uniqueId}`).value = savedTitle || '';
+        document.getElementById(`note-textarea-${uniqueId}`).value = savedNote || '';
+        document.getElementById(`note-color-${uniqueId}`).value = savedColor;
+    
+        document.getElementById(`save-note-${uniqueId}`).addEventListener('click', () => saveNoteContent(uniqueId));
+        document.getElementById(`delete-note-${uniqueId}`).addEventListener('click', () => deleteNoteContent(uniqueId));
+        document.querySelector(`.close-note[data-id="${uniqueId}"]`).addEventListener('click', () => closeNoteModal(uniqueId));
+    }
+    
+
+    // Function to open the note modal
+    function openNoteModal(uniqueId) {
+        const noteModal = document.getElementById(`note-modal-${uniqueId}`);
+        noteModal.style.display = 'block';
+    }
+
+    // Function to close the note modal
+    function closeNoteModal(uniqueId) {
+        document.getElementById(`note-modal-${uniqueId}`).style.display = 'none';
+    }
+
+    // Function to save the note content and title to localStorage
+    function saveNoteContent(uniqueId) {
+        const noteContent = document.getElementById(`note-textarea-${uniqueId}`).value;
+        const noteTitle = document.getElementById(`note-title-${uniqueId}`).value || 'New Note';
+        const noteColor = document.getElementById(`note-color-${uniqueId}`).value;
+    
+        localStorage.setItem(`noteContent-${uniqueId}`, noteContent);
+        localStorage.setItem(`noteTitle-${uniqueId}`, noteTitle);
+        localStorage.setItem(`noteColor-${uniqueId}`, noteColor);
+    
+        const noteButton = document.querySelector(`[data-id="${uniqueId}"]`);
+        if (noteButton) {
+            noteButton.textContent = noteTitle;
+            noteButton.style.backgroundColor = noteColor;
+        }
+    
+        closeNoteModal(uniqueId);
+    }
+    
+
+    // Function to load the note title from localStorage
+    function loadNoteTitle(uniqueId) {
+        return localStorage.getItem(`noteTitle-${uniqueId}`);
+    }
+
+    // Function to delete the note and the button
+    function deleteNoteContent(uniqueId) {
+        // Remove the note content and title from localStorage
+        localStorage.removeItem(`noteContent-${uniqueId}`);
+        localStorage.removeItem(`noteTitle-${uniqueId}`);
+        localStorage.removeItem(`noteButtonAdded-${uniqueId}`);
+
+        // Remove the note modal from the DOM
+        const noteModal = document.getElementById(`note-modal-${uniqueId}`);
+        if (noteModal) {
+            noteModal.remove();
+        }
+
+        // Remove the note button from the DOM
+        const noteButton = document.querySelector(`[data-id="${uniqueId}"]`);
+        if (noteButton) {
+            noteButton.remove();
+        }
+    }
+
+    // Event listener for adding a new note button
+    addNoteButton.addEventListener('click', () => {
+        const uniqueId = new Date().getTime(); // Generate a unique ID for each note button and modal
+        createNoteButton(uniqueId);
+        // Save the button's existence in localStorage
+        localStorage.setItem(`noteButtonAdded-${uniqueId}`, 'true');
+    });
+
+    // Load existing note buttons from localStorage
+    for (let key in localStorage) {
+        if (key.startsWith('noteButtonAdded-')) {
+            const uniqueId = key.split('-')[1];
+            createNoteButton(uniqueId); // Recreate buttons on page load
+        }
+    }
+
+    // Close modals if clicked outside
+    window.addEventListener('click', (event) => {
+        const modals = document.querySelectorAll('.modal');
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
 });
 
+function hideNoteButtons() {
+    const noteButtons = document.querySelectorAll('.note-button');
+    noteButtons.forEach(button => {
+        button.style.display = 'none'; // Hide each note button
+    });
+}
 
+function showNoteButtons() {
+    const noteButtons = document.querySelectorAll('.note-button');
+    noteButtons.forEach(button => {
+        button.style.display = 'inline-block'; // Show each note button
+    });
+}
+
+function hideAddNoteButton() {
+    const addNoteButton = document.getElementById('add-note-button');
+    addNoteButton.style.display = 'none'; // Hide the "Add Note" button
+}
+
+function showAddNoteButton() {
+    const addNoteButton = document.getElementById('add-note-button');
+    addNoteButton.style.display = 'inline-block'; // Show the "Add Note" button
+}

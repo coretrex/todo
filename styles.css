@@ -812,13 +812,13 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
 }
 /* Add these styles at the end of your styles.css file */
 
-/* Goals Modal Close Button */
-#goals-modal .modal-content {
+ .modal-content {
+    font-family: 'Poppins', sans-serif !important;
     display: flex;
     flex-direction: column;  /* Ensures vertical stacking */
     align-items: center;     /* Center align the items horizontally */
     justify-content: center; /* Center them vertically if needed */
-    width: 80%;              /* Width can be adjusted as per design needs */
+    width: 100%;              /* Width can be adjusted as per design needs */
     max-width: 600px;        /* Maximum width */
     padding: 20px;
     background-color: #fefefe;
@@ -828,27 +828,56 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     position: relative;
 }
 
-#goals-textarea {
-    width: 100%;            /* Makes textarea take full width of the modal */
-    height: 150px;          /* Adjust height to fit more content */
-    margin-bottom: 20px;    /* Space between textarea and button */
-    padding: 10px;
+.modal-content textarea {
     font-family: 'Poppins', sans-serif;
+    width: 100%;
+    padding: 10px;
     font-size: 16px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    resize: vertical;
+    margin-bottom: 10px;
+}
+.note-button-container .outline-button,
+.note-button-container .delete-note-btn {
+    flex: 1;
+    margin: 0 5px;
+    max-width: calc(50% - 10px); /* Ensure buttons don't exceed half the container width */
 }
 
 .outline-button {
-    width: auto;            /* Button width to fit content */
-    padding: 10px 20px;     /* Padding for better button size */
-    font-family: 'Poppins', sans-serif;
     background-color: transparent;
-    border: 2px solid #4CAF50; /* Green border */
+    border: 2px solid #4CAF50;
     color: #4CAF50;
-    border-radius: 5px;
-    cursor: pointer;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
     font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete-note-btn {
+    background-color: transparent;
+    border: 2px solid #f44336;
+    color: #f44336;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete-note-btn:hover {
+    background-color: #f44336;
+    color: white;
 }
 
 .outline-button:hover {
@@ -876,14 +905,14 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
     font-size: 16px;
     cursor: pointer;
 }
-#button-container {
+.button-container {
     display: flex;
-    justify-content: center;
-    padding: 10px;
+    justify-content: space-between;
+    margin-top: 10px;
 }
 
 #button-container button {
-    margin: 0 10px; /* Space out buttons */
+    margin: 0 5px; /* Space out buttons */
     padding: 10px 20px;
     cursor: pointer;
 }
@@ -891,3 +920,98 @@ body.blur-effect-enabled *:not(.task-input-modal, .task-input-modal *) {
 #new-module-name {
     margin-top: 10px; /* Space from the buttons */
 }
+
+.dashed-outline-button {
+    background-color: transparent;
+    border: 2px dashed #4CAF50; /* Dashed green border */
+    color: #4CAF50;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dashed-outline-button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+.note-button:focus {
+    outline: 2px solid #4CAF50; /* Optional: Highlight the button when editing */
+}
+
+.note-button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.note-button-container .outline-button,
+.note-button-container .delete-note-btn {
+    flex: 1;
+    margin: 0 5px;
+    max-width: calc(50% - 10px); /* Ensure buttons don't exceed half the container width */
+}
+
+
+
+.note-title-input {
+    padding: 0px 0px;     /* Padding for better button size */
+    font-family: 'Poppins', sans-serif;
+    background-color: transparent;
+    text-align: center;
+    color: #000000;
+    border:none;
+    cursor: pointer;
+    font-size: 26px;
+    font-weight: bold;
+}
+
+.close-note {
+    display: none;
+}
+
+.outline-button,
+.delete-note-btn {
+    font-family: 'Poppins', sans-serif;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: block !important;
+    font-size: 16px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
+#add-note-button {
+    width: auto !important;            /* Button width to fit content */
+    padding: 10px 10px !important;     /* Padding for better button size */
+    font-family: 'Poppins', sans-serif !important;
+    background-color: transparent !important;
+    border: 2px solid #ffffff !important; 
+    color: #ffffff !important;
+
+}
+
+.modal-buttons {
+    display: flex !important;
+    justify-content: space-between; /* Space out the buttons evenly */
+    gap: 10px; /* Add space between the buttons */
+    width: 100%; /* Ensure the container takes full width */
+}
+
+.modal-button {
+    flex: 1 !important; /* Make the buttons take equal space */
+    padding: 10px 20px; /* Adjust padding if needed */
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.note-color-picker {
+    display: block;
+    margin: 10px 0;
+}
+
