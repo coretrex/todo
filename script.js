@@ -928,6 +928,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to delete the note and the button
     function deleteNoteContent(uniqueId) {
         const userId = firebase.auth().currentUser.uid;
+        
+        // Ensure uniqueId is treated as a string
+        uniqueId = String(uniqueId);
+        
         firebase.firestore().collection('notes').doc(userId).collection('userNotes').doc(uniqueId).delete()
             .then(() => {
                 console.log("Note successfully deleted!");
@@ -938,6 +942,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error("Error deleting note: ", error);
             });
     }
+    
 
     // Event listener for adding a new note button
     addNoteButton.addEventListener('click', () => {
