@@ -1,5 +1,3 @@
-// script.js
-
 let timer;
 let currentTaskElement;
 let timerPaused = false;
@@ -555,7 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-    
+
 
 document.getElementById('add-task-button').addEventListener('click', showTaskInputModal);
 
@@ -790,37 +788,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const addNoteButton = document.getElementById('add-note-button');
     const buttonContainer = document.getElementById('button-container');
 
     // Function to create the new note button and modal
     function createNoteButton(uniqueId) {
-        // Check if the button already exists to prevent duplicates
         if (!document.querySelector(`[data-id="${uniqueId}"]`)) {
-            // Create the new note button
             const newNoteButton = document.createElement('button');
-            newNoteButton.textContent = loadNoteTitle(uniqueId) || 'New Note'; // Load title or default to 'New Note'
+            newNoteButton.textContent = 'New Note';
             newNoteButton.className = 'note-button';
-            newNoteButton.setAttribute('data-id', uniqueId); // Assign a unique ID to each button
-    
-            // Set default color to orange if no saved color is found
-            const savedColor = localStorage.getItem(`noteColor-${uniqueId}`) || '#FFA500'; // Default to orange (#FFA500)
-            newNoteButton.style.backgroundColor = savedColor;
-    
-            newNoteButton.addEventListener('click', () => openNoteModal(uniqueId)); // Pass the unique ID when opening the modal
-    
-            // Insert the new note button into the button container
-            const buttonContainer = document.getElementById('button-container');
-            const addNoteButton = document.getElementById('add-note-button');
+            newNoteButton.setAttribute('data-id', uniqueId);
+            newNoteButton.style.backgroundColor = '#FFA500'; // Default to orange
+
+            newNoteButton.addEventListener('click', () => openNoteModal(uniqueId));
+
             buttonContainer.insertBefore(newNoteButton, addNoteButton);
-    
-            // Create a new modal for this note
             createNoteModal(uniqueId);
         }
     }
-    
-    
 
     // Function to create a note modal
     function createNoteModal(uniqueId) {
@@ -841,14 +827,10 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.body.appendChild(noteModal);
     
-        const savedTitle = loadNoteTitle(uniqueId);
-        const savedNote = localStorage.getItem(`noteContent-${uniqueId}`);
-        const savedColor = localStorage.getItem(`noteColor-${uniqueId}`) || '#ffffff';
+        // Load the existing note data from Firebase
+        loadNoteFromFirebase(uniqueId);
     
-        document.getElementById(`note-title-${uniqueId}`).value = savedTitle || '';
-        document.getElementById(`note-textarea-${uniqueId}`).value = savedNote || '';
-        document.getElementById(`note-color-${uniqueId}`).value = savedColor;
-    
+        // Add event listeners for save and delete actions
         document.getElementById(`save-note-${uniqueId}`).addEventListener('click', () => saveNoteContent(uniqueId));
         document.getElementById(`delete-note-${uniqueId}`).addEventListener('click', () => deleteNoteContent(uniqueId));
         document.querySelector(`.close-note[data-id="${uniqueId}"]`).addEventListener('click', () => closeNoteModal(uniqueId));
@@ -866,66 +848,119 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(`note-modal-${uniqueId}`).style.display = 'none';
     }
 
-    // Function to save the note content and title to localStorage
+    // Function to save the note content and title to Firebase
     function saveNoteContent(uniqueId) {
         const noteContent = document.getElementById(`note-textarea-${uniqueId}`).value;
-        const noteTitle = document.getElementById(`note-title-${uniqueId}`).value || 'New Note';
+        const noteTitle = document.getElementById(`note-title-${uniqueId}`).value || 'New Note'; // Fetch title from input
         const noteColor = document.getElementById(`note-color-${uniqueId}`).value;
     
-        localStorage.setItem(`noteContent-${uniqueId}`, noteContent);
-        localStorage.setItem(`noteTitle-${uniqueId}`, noteTitle);
-        localStorage.setItem(`noteColor-${uniqueId}`, noteColor);
+        uniqueId = uniqueId.toString(); // Ensure uniqueId is a string
     
-        const noteButton = document.querySelector(`[data-id="${uniqueId}"]`);
-        if (noteButton) {
-            noteButton.textContent = noteTitle;
+        const userId = firebase.auth().currentUser.uid;
+    
+        // Save the note content, title, and color to Firebase
+        db.collection('notes').doc(userId).collection('userNotes').doc(uniqueId).set({
+            content: noteContent,
+            title: noteTitle,  // Ensure title is being saved
+            color: noteColor
+        })
+        .then(() => {
+            console.log("Note successfully saved!");
+    
+            // Update the button text to match the note title
+            const noteButton = document.querySelector(`[data-id="${uniqueId}"]`);
+            if (noteButton) {
+                noteButton.textContent = noteTitle; // Update the button text to the new note title
+            }
+    
+            // Update button color if changed
             noteButton.style.backgroundColor = noteColor;
-        }
-    
-        closeNoteModal(uniqueId);
+        })
+        .catch((error) => {
+            console.error("Error saving note: ", error);
+        });
     }
+    
+    
     
 
-    // Function to load the note title from localStorage
-    function loadNoteTitle(uniqueId) {
-        return localStorage.getItem(`noteTitle-${uniqueId}`);
+    // Function to load the note from Firebase
+    function loadNoteFromFirebase(uniqueId) {
+        const userId = firebase.auth().currentUser.uid;
+        firebase.firestore().collection('notes').doc(userId).collection('userNotes').doc(uniqueId.toString()).get()
+            .then((doc) => {
+                if (doc.exists) {
+                    const noteData = doc.data();
+                    const noteButton = document.querySelector(`[data-id="${uniqueId}"]`);
+                    
+                    // Load the note title
+                    if (typeof noteData.title === 'string') {
+                        document.getElementById(`note-title-${uniqueId}`).value = noteData.title || '';
+                        
+                        // Update button title with the loaded note title
+                        if (noteButton) {
+                            noteButton.textContent = noteData.title || 'New Note';
+                        }
+                    }
+                    
+                    // Load the note content
+                    if (typeof noteData.content === 'string') {
+                        document.getElementById(`note-textarea-${uniqueId}`).value = noteData.content || '';
+                    }
+    
+                    // Load the note color
+                    if (typeof noteData.color === 'string') {
+                        document.getElementById(`note-color-${uniqueId}`).value = noteData.color || '#ffffff';
+                        if (noteButton) {
+                            noteButton.style.backgroundColor = noteData.color || '#FFA500';
+                        }
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("Error loading note: ", error);
+            });
     }
+    
+    
+    
 
     // Function to delete the note and the button
     function deleteNoteContent(uniqueId) {
-        // Remove the note content and title from localStorage
-        localStorage.removeItem(`noteContent-${uniqueId}`);
-        localStorage.removeItem(`noteTitle-${uniqueId}`);
-        localStorage.removeItem(`noteButtonAdded-${uniqueId}`);
-
-        // Remove the note modal from the DOM
-        const noteModal = document.getElementById(`note-modal-${uniqueId}`);
-        if (noteModal) {
-            noteModal.remove();
-        }
-
-        // Remove the note button from the DOM
-        const noteButton = document.querySelector(`[data-id="${uniqueId}"]`);
-        if (noteButton) {
-            noteButton.remove();
-        }
+        const userId = firebase.auth().currentUser.uid;
+        firebase.firestore().collection('notes').doc(userId).collection('userNotes').doc(uniqueId).delete()
+            .then(() => {
+                console.log("Note successfully deleted!");
+                document.querySelector(`[data-id="${uniqueId}"]`).remove(); // Remove the button
+                document.getElementById(`note-modal-${uniqueId}`).remove(); // Remove the modal
+            })
+            .catch((error) => {
+                console.error("Error deleting note: ", error);
+            });
     }
 
     // Event listener for adding a new note button
     addNoteButton.addEventListener('click', () => {
         const uniqueId = new Date().getTime(); // Generate a unique ID for each note button and modal
         createNoteButton(uniqueId);
-        // Save the button's existence in localStorage
-        localStorage.setItem(`noteButtonAdded-${uniqueId}`, 'true');
     });
 
-    // Load existing note buttons from localStorage
-    for (let key in localStorage) {
-        if (key.startsWith('noteButtonAdded-')) {
-            const uniqueId = key.split('-')[1];
-            createNoteButton(uniqueId); // Recreate buttons on page load
+    // Load existing note buttons from Firebase
+    firebase.auth().onAuthStateChanged(function (user) {
+        if (user) {
+            const userId = user.uid;
+            firebase.firestore().collection('notes').doc(userId).collection('userNotes').get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const uniqueId = doc.id;
+                        createNoteButton(uniqueId);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error loading existing notes: ", error);
+                });
         }
-    }
+    });
 
     // Close modals if clicked outside
     window.addEventListener('click', (event) => {
@@ -938,26 +973,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-function hideNoteButtons() {
-    const noteButtons = document.querySelectorAll('.note-button');
-    noteButtons.forEach(button => {
-        button.style.display = 'none'; // Hide each note button
-    });
-}
-
-function showNoteButtons() {
-    const noteButtons = document.querySelectorAll('.note-button');
-    noteButtons.forEach(button => {
-        button.style.display = 'inline-block'; // Show each note button
-    });
-}
-
-function hideAddNoteButton() {
-    const addNoteButton = document.getElementById('add-note-button');
-    addNoteButton.style.display = 'none'; // Hide the "Add Note" button
-}
-
-function showAddNoteButton() {
-    const addNoteButton = document.getElementById('add-note-button');
-    addNoteButton.style.display = 'inline-block'; // Show the "Add Note" button
-}
