@@ -334,6 +334,20 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('start-timer-button').style.display = 'none';
 }
 
+function hideNoteButtons() {
+    const noteButtons = document.querySelectorAll('.note-button');
+    noteButtons.forEach(button => {
+        button.style.display = 'none';
+    });
+}
+
+function hideAddNoteButton() {
+    const addNoteButton = document.getElementById('add-note-button');
+    if (addNoteButton) {
+        addNoteButton.style.display = 'none';
+    }
+}
+
 
 
 // Function to stop the timer
