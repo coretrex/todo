@@ -305,14 +305,12 @@ function startTimer(minutes, button, resume = false) {
     hideNoteButtons();  // Hide all note buttons when the timer starts
     hideAddNoteButton();  // Hide the "Add Note" button when the timer starts
 
-    // Play the beep sound every 60 seconds (or any interval you choose)
-    beepSound.play();  // Optional: Play the beep once at the start
-
     timer = setInterval(() => {
         remainingTime = endTime - Date.now();
         if (remainingTime <= 0) {
             clearInterval(timer);
             document.getElementById('timer').textContent = '00:00';
+            beepSound.play();  // Play beep when the timer ends
             stopTimer();
         } else {
             const minutes = Math.floor(remainingTime / 60000);
@@ -320,11 +318,6 @@ function startTimer(minutes, button, resume = false) {
             document.getElementById('timer').textContent =
                 String(minutes).padStart(2, '0') + ':' +
                 String(seconds).padStart(2, '0');
-
-            // Play the beep sound every 60 seconds (or set a different interval)
-            if (seconds === 0) {
-                beepSound.play();  // Beep at the start of each new minute
-            }
         }
     }, 1000);
 
@@ -343,6 +336,7 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('done-timer-button').style.display = 'inline-block'; // Show Done button
     document.getElementById('start-timer-button').style.display = 'none';
 }
+
 
 
 function hideNoteButtons() {
