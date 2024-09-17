@@ -283,6 +283,8 @@ document.getElementById('stop-timer-button').addEventListener('click', stopTimer
 function startTimer(minutes, button, resume = false) {
     clearInterval(timer);
 
+    const beepSound = document.getElementById('beep-sound'); // Get the beep sound element
+
     if (currentTaskElement) {
         currentTaskElement.classList.remove('current-task');
     }
@@ -303,6 +305,9 @@ function startTimer(minutes, button, resume = false) {
     hideNoteButtons();  // Hide all note buttons when the timer starts
     hideAddNoteButton();  // Hide the "Add Note" button when the timer starts
 
+    // Play the beep sound every 60 seconds (or any interval you choose)
+    beepSound.play();  // Optional: Play the beep once at the start
+
     timer = setInterval(() => {
         remainingTime = endTime - Date.now();
         if (remainingTime <= 0) {
@@ -315,6 +320,11 @@ function startTimer(minutes, button, resume = false) {
             document.getElementById('timer').textContent =
                 String(minutes).padStart(2, '0') + ':' +
                 String(seconds).padStart(2, '0');
+
+            // Play the beep sound every 60 seconds (or set a different interval)
+            if (seconds === 0) {
+                beepSound.play();  // Beep at the start of each new minute
+            }
         }
     }, 1000);
 
@@ -334,12 +344,29 @@ function startTimer(minutes, button, resume = false) {
     document.getElementById('start-timer-button').style.display = 'none';
 }
 
+
 function hideNoteButtons() {
     const noteButtons = document.querySelectorAll('.note-button');
     noteButtons.forEach(button => {
         button.style.display = 'none';
     });
 }
+
+function showAddNoteButton() {
+    const addNoteButton = document.getElementById('add-note-button');
+    if (addNoteButton) {
+        addNoteButton.style.display = 'inline-block';
+    }
+}
+
+
+function showNoteButtons() {
+    const noteButtons = document.querySelectorAll('.note-button');
+    noteButtons.forEach(button => {
+        button.style.display = 'inline-block';
+    });
+}
+
 
 function hideAddNoteButton() {
     const addNoteButton = document.getElementById('add-note-button');
